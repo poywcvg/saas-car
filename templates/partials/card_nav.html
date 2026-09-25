@@ -1,0 +1,81 @@
+{# ===== CardNav (پورت Vanilla از React Bits) — ناوبری شناور صفحات عمومی ===== #}
+{# رفتار: دکمه‌ی همبرگری ناو را باز/بسته می‌کند؛ سه کارت با تأخیر پلکانی ظاهر می‌شوند. #}
+{# منطق انیمیشن در static/js/card-nav.js و استایل در static/src/input.css است. #}
+{# نکته: <button> واقعی به‌جای div نقش‌دارِ نسخه‌ی React (دسترس‌پذیری بهتر). #}
+<div class="card-nav-spacer" aria-hidden="true"></div>
+<div class="card-nav-container">
+  <nav class="card-nav" data-card-nav aria-label="ناوبری اصلی">
+    <div class="card-nav-top">
+      <button
+        type="button"
+        class="hamburger-menu"
+        data-card-nav-toggle
+        aria-expanded="false"
+        aria-controls="cardNavContent"
+        aria-label="باز کردن منو"
+      >
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <a href="{% url 'home' %}" class="logo-container" aria-label="سرویسا — صفحه‌ی اصلی">
+        <span class="card-nav-brand">
+          <span class="card-nav-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+          </span>
+          <span class="card-nav-brand-name">سرویسا</span>
+        </span>
+      </a>
+
+      <a href="{% url 'accounts:register' %}" class="card-nav-cta-button">شروع رایگان</a>
+    </div>
+
+    <div class="card-nav-content" id="cardNavContent" aria-hidden="true">
+      <div class="nav-card" style="background-color: #1b1722; color: #fff;">
+        <div class="nav-card-label">محصولات</div>
+        <div class="nav-card-links">
+          <a class="nav-card-link" href="/#products" aria-label="محصول تعویض روغن">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            تعویض روغن
+          </a>
+          <a class="nav-card-link" href="/#features" aria-label="امکانات سرویسا">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            امکانات
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-card" style="background-color: #2f293a; color: #fff;">
+        <div class="nav-card-label">راهنما</div>
+        <div class="nav-card-links">
+          <a class="nav-card-link" href="/#how" aria-label="سه قدم تا شروع">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            سه قدم تا شروع
+          </a>
+          <a class="nav-card-link" href="{% url 'accounts:login' %}" aria-label="ورود به حساب">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            ورود
+          </a>
+          <a class="nav-card-link" href="{% url 'blog:index' %}" aria-label="وبلاگ آموزشی">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            وبلاگ
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-card" style="background-color: #1735e1; color: #fff;">
+        <div class="nav-card-label">شروع کنید</div>
+        <div class="nav-card-links">
+          <a class="nav-card-link" href="{% url 'accounts:register' %}" aria-label="ثبت‌نام و شروع رایگان">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            شروع رایگان
+          </a>
+          <a class="nav-card-link" href="/#products" aria-label="مشاهده‌ی محصولات">
+            <svg class="nav-card-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            مشاهده‌ی محصولات
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>

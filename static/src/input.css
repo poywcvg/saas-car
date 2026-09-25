@@ -1,0 +1,1987 @@
+/* ===== فونت فارسی ایران‌یکان (self-host، هر وزن یک فایل woff2) ===== */
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 100; /* Thin */
+  font-display: swap;
+  src: url("../fonts/iranyekan-thin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 300; /* Light */
+  font-display: swap;
+  src: url("../fonts/iranyekan-light.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 400; /* Regular */
+  font-display: swap;
+  src: url("../fonts/iranyekan-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 500; /* Medium */
+  font-display: swap;
+  src: url("../fonts/iranyekan-medium.woff2") format("woff2");
+}
+/* semibold (600) فایل مستقل ندارد؛ مرورگر به Bold نگاشت می‌کند */
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 700; /* Bold */
+  font-display: swap;
+  src: url("../fonts/iranyekan-bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 800; /* ExtraBold */
+  font-display: swap;
+  src: url("../fonts/iranyekan-extrabold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 900; /* Black */
+  font-display: swap;
+  src: url("../fonts/iranyekan-black.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 950; /* ExtraBlack */
+  font-display: swap;
+  src: url("../fonts/iranyekan-extrablack.woff2") format("woff2");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== لایه‌ی پایه ===== */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    /* وزن پایه‌ی سنگین‌تر برای کل رابط */
+    @apply bg-surface-soft text-ink font-sans font-medium antialiased;
+  }
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+  }
+  /* تیترها با وزن بسیار سنگین */
+  h1 { @apply text-ink font-black tracking-tight; }
+  h2, h3 { @apply text-ink font-extrabold tracking-tight; }
+  h4 { @apply text-ink font-bold tracking-tight; }
+  ::selection {
+    @apply bg-brand-100 text-brand-900;
+  }
+}
+
+/* ===== کامپوننت‌های قابل استفاده مجدد ===== */
+@layer components {
+  /* --- دکمه‌ها --- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
+           text-sm font-semibold transition-all duration-150
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed select-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-sm
+           hover:bg-brand-700 active:bg-brand-800
+           focus-visible:ring-brand-500;
+  }
+  .btn-accent {
+    @apply btn bg-accent-500 text-white shadow-sm
+           hover:bg-accent-600 active:bg-accent-700
+           focus-visible:ring-accent-400;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-soft
+           hover:bg-surface-muted active:bg-slate-200
+           focus-visible:ring-slate-300;
+  }
+  .btn-outline {
+    @apply btn border border-slate-300 bg-white text-ink-soft
+           hover:bg-surface-soft hover:border-slate-400
+           focus-visible:ring-slate-300;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white shadow-sm
+           hover:brightness-95 focus-visible:ring-red-300;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-base rounded-2xl;
+  }
+  .btn-block {
+    @apply w-full;
+  }
+
+  /* --- کارت --- */
+  .card {
+    @apply bg-surface rounded-2xl shadow-card border border-slate-100;
+  }
+  .card-pad {
+    @apply p-5 sm:p-6;
+  }
+
+  /* --- فرم --- */
+  .field {
+    @apply space-y-1.5;
+  }
+  .label {
+    @apply block text-sm font-medium text-ink-soft;
+  }
+  .input {
+    @apply block w-full rounded-xl border border-slate-300 bg-white
+           px-4 py-2.5 text-sm text-ink placeholder:text-slate-400
+           shadow-sm transition
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none;
+  }
+  .input-error {
+    @apply border-danger focus:border-danger focus:ring-red-100;
+  }
+  .help {
+    @apply text-xs text-ink-muted;
+  }
+  .error-text {
+    @apply text-xs font-medium text-danger;
+  }
+
+  /* --- نشان‌ها / وضعیت --- */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1
+           text-xs font-semibold;
+  }
+  .badge-ok {
+    @apply badge bg-green-50 text-green-700;
+  }
+  .badge-warn {
+    @apply badge bg-amber-50 text-amber-700;
+  }
+  .badge-danger {
+    @apply badge bg-red-50 text-red-700;
+  }
+  .badge-neutral {
+    @apply badge bg-slate-100 text-slate-600;
+  }
+
+  .btn-growth {
+    @apply btn bg-growth-600 text-white shadow-sm
+           hover:bg-growth-700 active:bg-growth-700
+           focus-visible:ring-growth-500;
+  }
+
+  /* --- چیدمان --- */
+  .container-app {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  /* --- کارت محصول (ویترین خدمات خودرو) --- */
+  .product-card {
+    @apply relative flex flex-col rounded-2xl border border-slate-100 bg-surface
+           p-5 shadow-card transition-all duration-200;
+  }
+  .product-card-live {
+    @apply hover:-translate-y-1 hover:shadow-pop hover:border-brand-200;
+  }
+  .product-card-soon {
+    @apply opacity-95;
+  }
+  .product-icon {
+    @apply grid h-12 w-12 shrink-0 place-items-center rounded-2xl;
+  }
+
+  /* --- نشان‌ها‌ی تکمیلی --- */
+  .badge-growth {
+    @apply badge bg-growth-50 text-growth-700;
+  }
+  .badge-brand {
+    @apply badge bg-brand-50 text-brand-700;
+  }
+  .badge-soon {
+    @apply badge bg-slate-100 text-slate-500;
+  }
+
+  /* --- تراشه/پیل ویژگی --- */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-surface-soft
+           px-3 py-1 text-xs font-bold text-ink-soft;
+  }
+
+  /* --- کارت نقل‌قول / اعتماد اجتماعی --- */
+  .quote-card {
+    @apply rounded-2xl border border-slate-100 bg-surface p-6 shadow-card;
+  }
+
+  /* --- نقطه‌ی وضعیت --- */
+  .dot {
+    @apply inline-block h-2 w-2 rounded-full;
+  }
+
+/* --- ناوبری کناری (ساید‌بار) --- */
+.nav-link {
+  @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5
+         text-sm font-bold text-ink-soft transition-colors duration-150
+         hover:bg-brand-50 hover:text-brand-700;
+}
+.nav-link svg {
+  @apply h-5 w-5 shrink-0 text-ink-muted transition-colors duration-150;
+}
+.nav-link:hover svg {
+  @apply text-brand-600;
+}
+/* حالت فعال: صفحه‌ی جاری */
+.nav-link-active {
+  @apply bg-brand-600 text-white shadow-pop hover:bg-brand-600 hover:text-white;
+}
+.nav-link-active svg {
+  @apply text-white;
+}
+.nav-link-active:hover svg {
+  @apply text-white;
+}
+
+/* --- اسکرول مستقل ساید‌بار و محتوا --- */
+.vt-sidebar nav {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.slate.300') transparent;
+}
+.vt-sidebar nav::-webkit-scrollbar {
+  width: 5px;
+}
+.vt-sidebar nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.vt-sidebar nav::-webkit-scrollbar-thumb {
+  background-color: theme('colors.slate.300');
+  border-radius: 999px;
+}
+.vt-sidebar nav::-webkit-scrollbar-thumb:hover {
+  background-color: theme('colors.slate.400');
+}
+
+  /* --- تراشه‌ی قابل‌حذف (لیست گزینه‌ها) --- */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-200
+           bg-white px-3 py-1.5 text-sm font-bold text-ink-soft shadow-sm;
+  }
+  .chip-off {
+    @apply opacity-50;
+  }
+  .chip-x {
+    @apply grid h-5 w-5 place-items-center rounded-full text-ink-muted
+           transition-colors hover:bg-red-50 hover:text-danger;
+  }
+  .chip-count {
+    @apply mr-auto rounded-full bg-surface-muted px-2 py-0.5 text-xs
+           font-bold text-ink-muted num;
+  }
+
+  /* --- دکمه‌ی آیکونی مربعی --- */
+  .icon-btn {
+    @apply grid h-8 w-8 shrink-0 place-items-center rounded-lg text-ink-soft
+           transition-colors hover:bg-surface-muted;
+  }
+  .icon-btn-danger {
+    @apply hover:bg-red-50 hover:text-danger;
+  }
+}
+
+/* ===== ابزارهای کمکی ===== */
+@layer utilities {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* پس‌زمینه‌ی گرادیان برند برای بخش‌های تأکیدی (CTA) */
+  .gradient-brand {
+    background-image: linear-gradient(135deg, #1735e1 0%, #1f47f5 45%, #3366ff 100%);
+  }
+  /* متن گرادیانی برند + تأکید (برای تیترهای قهرمان) */
+  .text-gradient {
+    background-image: linear-gradient(90deg, #1f47f5, #f1830e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* --- موشن ورود (حالت پایه/بدون JS): محتوا همیشه دیده می‌شود --- */
+  /* ورود پلکانی عناصر هنگام لود صفحه */
+  .stagger > * {
+    opacity: 0;
+    animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0.04s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.09s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.14s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.19s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.24s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.29s; }
+  .stagger > *:nth-child(7) { animation-delay: 0.34s; }
+  .stagger > *:nth-child(n + 8) { animation-delay: 0.38s; }
+
+  /* ورود یک عنصر */
+  .reveal {
+    animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* ===== کلیدهای موشن خلاقانه ===== */
+/* «برخاستن»: بالا‌آمدن + مقیاس ریز + محو‌شدنِ تاری (حس عمق و نرمی) */
+@keyframes rise-in {
+  0%   { opacity: 0; transform: translateY(24px) scale(0.97); filter: blur(8px); }
+  55%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+/* ورود کل صفحه: بسیار ملایم تا هر صفحه — حتی بدون کلاس reveal — جان بگیرد */
+@keyframes page-shell {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== موتور اسکرول‌ریویل (فقط وقتی JS و حرکت مجازند: کلاس .anim) ===== */
+/* عناصر تا لحظهٔ دیده‌شدن مخفی‌اند، سپس با ورود به دید انیمیت می‌شوند */
+.anim main { animation: page-shell 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+.anim .reveal,
+.anim .stagger > *,
+.anim [data-reveal] {
+  opacity: 0;
+  animation: none !important;
+  will-change: transform, opacity, filter;
+}
+.anim .reveal.is-in,
+.anim .stagger > *.is-in,
+.anim [data-reveal].is-in {
+  animation: rise-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* ===== ترنزیشن بین صفحه‌ها (View Transitions API) ===== */
+/* در مرورگرهای پشتیبان، جابه‌جایی بین صفحه‌ها نرم و محو‌شونده می‌شود؛ */
+/* در بقیه، ناوبری عادی و بدون خطا اجرا می‌شود. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: vt-out 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: vt-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* صفحهٔ رفته: کمی فرو می‌رود، تار و محو می‌شود (حس عمق) */
+@keyframes vt-out {
+  to { opacity: 0; transform: scale(0.985) translateY(-8px); filter: blur(4px); }
+}
+/* صفحهٔ تازه: از پایین با تاری و مقیاس ریز برمی‌خیزد */
+@keyframes vt-in {
+  0%   { opacity: 0; transform: scale(0.99) translateY(14px); filter: blur(6px); }
+  60%  { filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+/* ساید‌بار و نوار بالا هنگام جابه‌جایی صفحه ثابت بمانند (بدون فلیکر) */
+.vt-sidebar { view-transition-name: app-sidebar; }
+.vt-topbar { view-transition-name: app-topbar; }
+
+/* ===== نوار پیشرفت بالای صفحه (موشن لود ناوبری) ===== */
+#nprogress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease 0.15s;
+}
+#nprogress.on {
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+#nprogress > span {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #1f47f5, #598eff, #f1830e);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 10px rgba(31, 71, 245, 0.5);
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+/* درخششِ روان که روی نوار حرکت می‌کند */
+#nprogress > span::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 90px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  animation: np-shimmer 1s linear infinite;
+}
+@keyframes np-shimmer {
+  from { transform: translateX(-120px); }
+  to   { transform: translateX(120px); }
+}
+
+/* ===== پردهٔ برند (اسپلش یک‌بار در هر نشست مرورگر) ===== */
+/* در بارگذاری‌های بعدیِ همان نشست، پرده اصلاً دیده نمی‌شود */
+html[data-curtain="seen"] #brand-curtain { display: none; }
+
+#brand-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #1735e1 0%, #1f47f5 48%, #3366ff 100%);
+  animation: curtain-out 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.95s forwards;
+}
+#brand-curtain .mark {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+  transform: translateY(6px);
+  opacity: 0;
+  animation: curtain-mark 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+#brand-curtain .mark svg { height: 2.75rem; width: 2.75rem; }
+#brand-curtain .mark .name {
+  font-weight: 900;
+  font-size: 1.9rem;
+  letter-spacing: -0.01em;
+}
+/* خط سرعتِ زیر لوگو که پر می‌شود */
+#brand-curtain .track {
+  position: absolute;
+  bottom: 22%;
+  height: 3px;
+  width: 132px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.22);
+}
+#brand-curtain .track::after {
+  content: "";
+  position: absolute;
+  inset: 0 100% 0 0;
+  background: #fff;
+  border-radius: 999px;
+  animation: curtain-fill 0.85s cubic-bezier(0.65, 0, 0.35, 1) 0.15s forwards;
+}
+@keyframes curtain-mark {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes curtain-fill {
+  to { inset: 0 0 0 0; }
+}
+@keyframes curtain-out {
+  to { opacity: 0; transform: scale(1.04); visibility: hidden; }
+}
+
+/* ============================================================= */
+/*  کامپوننت‌های برگرفته از uiverse.io (تطبیق‌یافته: برند + RTL)    */
+/* ============================================================= */
+
+/* ---- لودرها / اسپینر (بر پایهٔ Loader از Fernando-sv، MIT) ---- */
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: uv-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+.loader-lg { width: 40px; height: 40px; border-width: 4px; }
+.loader-sm { width: 15px; height: 15px; border-width: 2px; }
+/* نسخهٔ برند: کمانِ رنگیِ برند روی زمینهٔ کم‌رنگ */
+.loader-brand {
+  color: rgba(31, 71, 245, 0.22);
+  border-inline-start-color: #1f47f5;
+  border-inline-end-color: transparent;
+}
+@keyframes uv-spin { to { transform: rotate(360deg); } }
+
+/* لودر تمام‌بخش (وسطِ یک ناحیه/کارت) */
+.loader-center {
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 0;
+}
+
+/* ---- حالتِ در حالِ ارسالِ دکمه (اسپینر داخل دکمه) ---- */
+.btn.is-loading {
+  color: transparent !important;
+  pointer-events: none;
+  position: relative;
+}
+.btn.is-loading > * { visibility: hidden; }
+.btn.is-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.15em;
+  height: 1.15em;
+  margin: -0.575em 0 0 -0.575em;
+  border: 2.5px solid rgba(255, 255, 255, 0.55);
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: uv-spin 0.7s linear infinite;
+}
+/* روی دکمه‌های روشن (ghost/outline) اسپینر تیره دیده شود */
+.btn-ghost.is-loading::after,
+.btn-outline.is-loading::after {
+  border-color: rgba(15, 23, 42, 0.4);
+  border-inline-end-color: transparent;
+}
+
+/* ---- درخششِ روان روی دکمه‌ها (uiverse shine sweep) ---- */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn-primary::before,
+.btn-accent::before,
+.btn-growth::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.38) 50%, transparent 80%);
+  transform: translateX(-130%);
+}
+.btn-primary:hover::before,
+.btn-accent:hover::before,
+.btn-growth:hover::before {
+  animation: uv-shine 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes uv-shine {
+  to { transform: translateX(130%); }
+}
+
+/* ---- فیلد جست‌وجو (From Uiverse.io by Smit-Prajapati — تطبیق‌یافته: برند + RTL) ---- */
+/* ساختار موردنیاز: .search-field شامل svg آیکون + input (آیکون اول در DOM) —
+   در چیدمان راست‌به‌چپ آیکون خودکار سمت راست می‌نشیند، مثل نسخه‌ی اصلی.
+   نکته: کلاس‌های سراسری نسخه‌ی اصلی (.container و .input) عمداً استفاده
+   نشده‌اند تا با کامپوننت‌های هم‌نام پروژه تداخل نکنند. */
+.search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #bcd3ff 0%, #8eb6ff 100%);
+  padding: 5px;
+  z-index: 0;
+}
+.search-field::before,
+.search-field::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  position: absolute;
+}
+.search-field::before {
+  top: -1px;
+  left: -1px;
+  background: linear-gradient(0deg, #eef4ff 0%, #ffffff 100%);
+  z-index: -1;
+}
+.search-field::after {
+  bottom: -1px;
+  right: -1px;
+  background: linear-gradient(0deg, #8eb6ff 0%, #d9e6ff 100%);
+  box-shadow: rgba(31, 71, 245, 0.45) 3px 3px 5px 0px, rgba(31, 71, 245, 0.45) 5px 5px 20px 0px;
+  z-index: -2;
+  transition: box-shadow 0.25s ease;
+}
+.search-field:focus-within::after {
+  box-shadow: rgba(31, 71, 245, 0.65) 3px 3px 8px 0px, rgba(31, 71, 245, 0.55) 5px 5px 28px 0px;
+}
+.search-field > svg,
+.search-field > button,
+.search-field .search-icon {
+  width: 46px;
+  height: 46px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-inline-end: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  padding: 11px;
+  margin-inline-end: 6px;
+  color: #fff;
+  background: linear-gradient(135deg, #598eff 0%, #1f47f5 100%);
+  transition: border-inline-end-width 0.2s ease;
+}
+/* آیکونِ تنها تزئینی است؛ دکمه کلیک‌پذیر است و فرم را سابمیت می‌کند */
+.search-field > svg,
+.search-field .search-icon {
+  pointer-events: none;
+}
+.search-field > button {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  display: grid;
+  place-items: center;
+}
+.search-field > button > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.search-field:hover > svg,
+.search-field:hover > button,
+.search-field:hover .search-icon {
+  border-inline-end-width: 3px;
+}
+.search-field > button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.search-field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #f2f7ff 0%, #e2ecfd 100%);
+  border: none;
+  border-radius: 50px;
+  color: #0f172a;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+.search-field input::placeholder { color: #7d9cc4; }
+.search-field input:focus {
+  outline: none;
+  background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+  box-shadow: inset 0 0 0 2px rgba(31, 71, 245, 0.35);
+}
+/* نسخه‌ی کامپکت برای هدر (مثلاً نوار بالای داشبورد با ارتفاع ۶۴px):
+   بج ۳۶px + پدینگ کمتر = ارتفاع کل ۴۴px */
+.search-field-sm {
+  padding: 4px;
+  gap: 4px;
+}
+.search-field-sm > svg,
+.search-field-sm > button,
+.search-field-sm .search-icon {
+  width: 36px;
+  height: 36px;
+  padding: 9px;
+  margin-inline-end: 4px;
+}
+.search-field-sm input {
+  padding: 7px 14px;
+  font-size: 0.875rem;
+}
+
+/* ---- منوی کشویی (From Uiverse.io by gharsh11032000 — تطبیق‌یافته: برند + RTL) ---- */
+/* نام‌فضای uv- تا با کلاس‌های عمومی (.menu و .link) تداخل نکند.
+   آینه‌شده برای راست‌به‌چپ: جهت پرشدن fill برعکس نسخه‌ی اصلی است.
+   بازشدن هم با هاور هم با فوکس (کیبورد/تاچ) کار می‌کند. */
+.uv-menu {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #0f172a;
+  width: fit-content;
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+.uv-menu a {
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.uv-menu .uv-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  isolation: isolate;
+  overflow: hidden;
+  font-weight: 800;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-menu .uv-link::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1f47f5;
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-menu .uv-link svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-menu .uv-item {
+  position: relative;
+}
+.uv-menu .uv-item .uv-submenu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: absolute;
+  top: calc(100% + 2px);
+  border-radius: 0 0 16px 16px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-width: max-content;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px);
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 30;
+  pointer-events: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.uv-menu .uv-item:hover .uv-submenu,
+.uv-menu .uv-item:focus-within .uv-submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  border-top: transparent;
+  border-color: #1f47f5;
+}
+.uv-menu .uv-item:hover .uv-link,
+.uv-menu .uv-item:focus-within .uv-link {
+  color: #ffffff;
+  border-radius: 16px 16px 0 0;
+  border-color: #1f47f5;
+}
+.uv-menu .uv-item:hover .uv-link::after,
+.uv-menu .uv-item:focus-within .uv-link::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.uv-menu .uv-item:hover .uv-link svg,
+.uv-menu .uv-item:focus-within .uv-link svg {
+  transform: rotate(-180deg);
+}
+.uv-submenu .uv-submenu-item {
+  width: 100%;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-submenu .uv-submenu-link {
+  display: block;
+  padding: 12px 24px;
+  width: 100%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: center;
+  font-weight: 700;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-submenu .uv-submenu-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scaleX(0);
+  width: 100%;
+  height: 100%;
+  background-color: #1f47f5;
+  z-index: -1;
+  transform-origin: right;
+  transition: transform 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.uv-submenu .uv-submenu-link:hover::before,
+.uv-submenu .uv-submenu-link:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.uv-submenu .uv-submenu-link:hover,
+.uv-submenu .uv-submenu-link:focus-visible {
+  color: #ffffff;
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .uv-menu .uv-link,
+  .uv-menu .uv-link::after,
+  .uv-menu .uv-link svg,
+  .uv-menu .uv-item .uv-submenu,
+  .uv-submenu .uv-submenu-item,
+  .uv-submenu .uv-submenu-link,
+  .uv-submenu .uv-submenu-link::before {
+    transition: none;
+  }
+}
+
+/* فوتر (الهام از uiverse) */
+.site-footer {
+  position: relative;
+  border-top: 1px solid theme('colors.slate.100');
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1f47f5, #6366f1 45%, #22c55e 100%);
+  background-size: 200% 100%;
+  animation: uv-footer-sheen 6s linear infinite;
+}
+@keyframes uv-footer-sheen { to { background-position: 200% 0; } }
+.footer-link {
+  position: relative;
+  color: theme('colors.ink.muted');
+  transition: color 0.2s ease, padding-inline-start 0.2s ease;
+}
+.footer-link::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -0.9rem;
+  top: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 9999px;
+  background: #1f47f5;
+  transform: translateY(-50%) scale(0);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-link:hover {
+  color: #1f47f5;
+  padding-inline-start: 0.55rem;
+}
+.footer-link:hover::before { transform: translateY(-50%) scale(1); }
+.footer-social {
+  display: grid;
+  place-items: center;
+  height: 2.4rem;
+  width: 2.4rem;
+  border-radius: 0.85rem;
+  border: 1.5px solid theme('colors.slate.200');
+  color: theme('colors.ink.soft');
+  background: #fff;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.footer-social svg { height: 1.15rem; width: 1.15rem; }
+.footer-social:hover {
+  color: #1f47f5;
+  border-color: #1f47f5;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -8px rgba(31, 71, 245, 0.45);
+}
+
+/* کارت تعاملی (الهام از uiverse) — برای کارت‌های قابل‌کلیک */
+.card-interactive {
+  position: relative;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.28s ease;
+  will-change: transform;
+}
+.card-interactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(31, 71, 245, 0.55), rgba(99, 102, 241, 0.15) 40%, transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 40px -22px rgba(31, 71, 245, 0.4), 0 8px 18px -12px rgba(15, 23, 42, 0.18);
+  border-color: transparent;
+}
+.card-interactive:hover::after { opacity: 1; }
+.card-interactive:active { transform: translateY(-1px); }
+
+/* --- فرم و اینپوت (الهام از uiverse) --- */
+.input {
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease;
+}
+.input:focus {
+  box-shadow: 0 0 0 4px rgba(31, 71, 245, 0.13), 0 6px 18px -8px rgba(31, 71, 245, 0.3);
+}
+/* برچسبِ فیلد هنگام فوکوس، رنگِ برند می‌گیرد */
+.field:focus-within > .label { color: #1f47f5; transition: color 0.2s ease; }
+/* فلشِ سفارشیِ منوی کشویی (سمتِ end = چپ در RTL) */
+select.input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.9rem center;
+  background-size: 1.1rem;
+  padding-inline-end: 2.6rem;
+}
+/* حالتِ خطا: قابِ قرمز + لرزشِ کوتاه هنگام ظاهر شدن */
+.input-error,
+.field:has(.error-text) .input {
+  border-color: theme('colors.danger');
+  animation: uv-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.field:has(.error-text) .input:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+@keyframes uv-shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+/* حرکتِ ظریفِ آیکون‌ها (الهام از uiverse) */
+.nav-link svg { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s ease; }
+.nav-link:hover svg { transform: scale(1.12) rotate(-3deg); }
+.nav-link:active svg { transform: scale(0.95); }
+.nav-link-active svg { animation: uv-icon-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes uv-icon-pop { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+/* آیکونِ داخل دکمه‌ها: کمی جلو می‌آید هنگام هاور */
+.btn svg { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.btn:hover svg { transform: translateY(-1px) scale(1.08); }
+
+/* --- دکمه‌های بیشتر (الهام از uiverse) --- */
+/* فشارِ ظریف هنگام کلیک */
+.btn:active { transform: scale(0.96); }
+.btn.is-loading:active { transform: none; }
+/* دکمه‌ی فقط‌آیکونی */
+.btn-icon {
+  padding: 0;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.9rem;
+}
+.btn-icon.btn-lg { width: 3rem; height: 3rem; }
+.btn-icon:hover svg { transform: scale(1.12); }
+/* درخششِ دکمه‌ی خطر هم مثل بقیه */
+.btn-danger::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.35) 50%, transparent 80%);
+  transform: translateX(-130%);
+}
+.btn-danger:hover::before { animation: uv-shine 0.75s cubic-bezier(0.22, 1, 0.36, 1); }
+/* موجِ کلیک (ripple) — عنصرش را جاوااسکریپت می‌سازد */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  transform: scale(0);
+  animation: uv-ripple 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+.btn-ghost .ripple,
+.btn-outline .ripple { background: rgba(31, 71, 245, 0.22); }
+@keyframes uv-ripple { to { transform: scale(2.4); opacity: 0; } }
+
+/* --- بَج‌های وضعیت با پالسِ زنده (الهام از uiverse) --- */
+/* --- بَج‌های وضعیت: رنگ + آیکون + کلمه (برای فهمِ آسان) --- */
+/* هر بَجِ وضعیت یک آیکونِ گویا پیش از متن می‌گیرد (خودکار، بدون تغییرِ تمپلیت) */
+.badge-ok::before,
+.badge-warn::before,
+.badge-danger::before,
+.badge-neutral::before {
+  content: "";
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+          mask-position: center;
+  -webkit-mask-size: contain;
+          mask-size: contain;
+}
+/* تیک = سالم */
+.badge-ok::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+}
+/* ساعت = نزدیک موعد */
+.badge-warn::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
+}
+/* علامتِ هشدار = گذشته از موعد */
+.badge-danger::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+}
+/* خط‌تیره = بدون سابقه */
+.badge-neutral::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M5 12h14'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M5 12h14'/%3E%3C/svg%3E");
+}
+/* پالسِ ظریفِ آیکون برای وضعیت‌های نیازمندِ توجه (نزدیک موعد/گذشته) */
+.badge-pulse::before { animation: uv-badge-breathe 1.6s ease-in-out infinite; }
+@keyframes uv-badge-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.22); }
+}
+
+/* --- تولتیپ (الهام از uiverse) --- */
+.uv-tip { position: relative; }
+.uv-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  inset-inline-start: 50%;
+  transform: translateX(50%) translateY(4px);
+  white-space: nowrap;
+  background: theme('colors.ink.DEFAULT');
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 40;
+}
+.uv-tip:hover::after,
+.uv-tip:focus-visible::after { opacity: 1; transform: translateX(50%) translateY(0); }
+
+/* --- پنجره‌ی تأیید (برای کارهای مهم؛ ساده و بزرگ) --- */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.confirm-modal.is-open { opacity: 1; }
+.confirm-box {
+  width: 100%;
+  max-width: 22rem;
+  background: #fff;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.4);
+  transform: scale(0.92) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.confirm-modal.is-open .confirm-box { transform: scale(1) translateY(0); }
+.confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 0.9rem;
+  border-radius: 9999px;
+  background: theme('colors.red.50');
+  color: theme('colors.danger');
+}
+.confirm-icon svg { width: 1.75rem; height: 1.75rem; }
+.confirm-msg { font-size: 1rem; font-weight: 800; color: theme('colors.ink.DEFAULT'); line-height: 1.9; }
+.confirm-actions { display: flex; gap: 0.6rem; margin-top: 1.25rem; }
+.confirm-actions > * { flex: 1; }
+
+/* --- تب‌ها (الهام از uiverse) --- */
+.uv-tabs {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.9rem;
+  background: theme('colors.surface.muted');
+}
+.uv-tab {
+  border: 0;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: theme('colors.ink.soft');
+  background: transparent;
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.uv-tab:hover { color: theme('colors.ink.DEFAULT'); }
+.uv-tab[aria-selected="true"],
+.uv-tab.is-active {
+  background: #fff;
+  color: #1f47f5;
+  box-shadow: 0 2px 8px -3px rgba(15, 23, 42, 0.18);
+}
+
+/* --- اسکلتونِ لودینگ (الهام از uiverse) --- */
+.uv-skeleton {
+  border-radius: 0.6rem;
+  background: linear-gradient(100deg, #eef2f7 30%, #f8fafc 50%, #eef2f7 70%);
+  background-size: 200% 100%;
+  animation: uv-skeleton 1.3s ease-in-out infinite;
+}
+@keyframes uv-skeleton { to { background-position: -200% 0; } }
+.uv-skeleton-text { height: 0.75rem; margin-block: 0.35rem; }
+.uv-skeleton-line { height: 1rem; }
+
+/* --- سوییچ/toggle (الهام از uiverse) --- */
+.uv-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+.uv-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.uv-switch .track {
+  width: 2.85rem;
+  height: 1.6rem;
+  border-radius: 9999px;
+  background: theme('colors.slate.300');
+  transition: background 0.25s ease;
+  position: relative;
+}
+.uv-switch .track::after {
+  content: "";
+  position: absolute;
+  top: 0.2rem;
+  inset-inline-start: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.25);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.uv-switch input:checked + .track { background: #1f47f5; }
+.uv-switch input:checked + .track::after { transform: translateX(-1.25rem); }
+.uv-switch input:focus-visible + .track { box-shadow: 0 0 0 4px rgba(31, 71, 245, 0.2); }
+
+/* احترام به تنظیم «کاهش حرکت» کاربر */
+@media (prefers-reduced-motion: reduce) {
+  .stagger > *,
+  .reveal,
+  .anim main,
+  .anim .reveal,
+  .anim .stagger > *,
+  .anim [data-reveal],
+  .anim .reveal.is-in,
+  .anim .stagger > *.is-in,
+  .anim [data-reveal].is-in {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+  #nprogress { display: none; }
+  #brand-curtain { display: none !important; }
+  /* درخششِ دکمه غیرضروری است؛ اسپینرها (بازخوردِ لازم) باقی می‌مانند */
+  .btn-primary::before,
+  .btn-accent::before,
+  .btn-growth::before,
+  .btn-primary:hover::before,
+  .btn-accent:hover::before,
+  .btn-growth:hover::before {
+    animation: none !important;
+    display: none;
+  }
+  .site-footer::before { animation: none !important; }
+  .footer-social:hover { transform: none; }
+  .card-interactive,
+  .card-interactive:hover,
+  .card-interactive:active { transform: none !important; }
+  .nav-link svg,
+  .nav-link:hover svg,
+  .nav-link:active svg,
+  .nav-link-active svg,
+  .btn svg,
+  .btn:hover svg { transform: none !important; animation: none !important; }
+  .input-error,
+  .field:has(.error-text) .input { animation: none !important; }
+  .uv-skeleton { animation: none !important; }
+  .badge-pulse::before { animation: none !important; }
+  .ripple { display: none !important; }
+  .btn:active { transform: none !important; }
+  .btn-danger::before { display: none; }
+  .confirm-modal, .confirm-box { transition: none !important; }
+  .confirm-box { transform: none !important; }
+}
+
+/* ============================================================
+   کارت قیمت محصول (اقتباس از Uiverse by marwam112010 — RTL + فارسی)
+   استفاده: تعویض روغن — ۷ روز اول رایگان، بعد ۴۹ هزار تومان/ماه
+   نام‌فضا pack-* تا با .header/.title عمومی تداخل نکند.
+   ============================================================ */
+@layer components {
+  .pack-container {
+    @apply relative flex w-full max-w-sm flex-col rounded-2xl p-6 sm:p-7;
+    background-color: #212121;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    color: #fff;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  }
+  .pack-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 40px -22px rgba(31, 71, 245, 0.45), 0 8px 18px -12px rgba(0, 0, 0, 0.35);
+    border-color: #fff;
+  }
+  /* نوار برند بالای کارت پرچم‌دار */
+  .pack-container-flagship::before {
+    content: "";
+    position: absolute;
+    inset-inline: 1.5rem;
+    top: -1px;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(90deg, #1f47f5, #6366f1 45%, #22c55e 100%);
+  }
+
+  .pack-header {
+    position: relative;
+    margin: 0 0 1.25rem 0;
+    overflow: hidden;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.85);
+    background: transparent;
+    padding-bottom: 1rem;
+    text-align: center;
+  }
+  .pack-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    @apply font-extrabold;
+  }
+  /* لوگوی اختصاصی هر محصول — دایره‌ی وسط هدر کارت */
+  .pack-logo {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+  .pack-logo svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .pack-container-soon .pack-logo {
+    border-color: theme('colors.slate.200');
+    background-color: theme('colors.surface.muted');
+    color: theme('colors.ink.muted');
+  }
+  .pack-trial-badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold;
+    background: rgba(34, 197, 94, 0.18);
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    color: #bbf7d0;
+  }
+  .pack-price-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 3.4rem;
+    line-height: 1;
+    @apply font-black num;
+  }
+  .pack-price-container .pack-currency {
+    margin-top: 10px;
+    font-size: 1.15rem;
+    line-height: 2rem;
+    @apply font-bold;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .pack-price-container .pack-period {
+    align-self: flex-end;
+    font-size: 1.15rem;
+    line-height: 2.2rem;
+    @apply font-bold;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .pack-trial-note {
+    @apply mt-2 text-center text-sm font-bold;
+    color: #bbf7d0;
+  }
+
+  .pack-lists {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .pack-list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pack-list-icon {
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background-color: rgba(255, 255, 255, 0.185);
+    height: 30px;
+    width: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pack-list-icon svg {
+    height: 12px;
+    width: 12px;
+  }
+  .pack-list p {
+    display: block;
+    @apply text-sm font-medium leading-7;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .pack-button-container {
+    margin-top: 20px;
+    padding: 0;
+  }
+  .pack-button-container .pack-btn {
+    display: block;
+    width: 100%;
+    background-color: #fff;
+    padding: 12px 20px;
+    color: #000;
+    outline: 0;
+    border: 0;
+    border-radius: 10px;
+    @apply text-sm font-extrabold transition-all duration-150;
+  }
+  .pack-button-container .pack-btn:hover {
+    background-color: #1f47f5;
+    color: #fff;
+    box-shadow: 0 10px 24px -10px rgba(31, 71, 245, 0.7);
+  }
+  .pack-button-container .pack-btn:active { transform: scale(0.98); }
+  .pack-button-container .pack-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  /* نسخه‌ی روشن برای محصولات «به‌زودی» — همان ساختار، تم روشن */
+  .pack-container-soon {
+    background: #fff;
+    border: 1px solid theme('colors.slate.100');
+    color: theme('colors.ink.DEFAULT');
+    box-shadow: theme('boxShadow.card');
+  }
+  .pack-container-soon .pack-header { border-bottom-color: theme('colors.slate.100'); }
+  .pack-container-soon .pack-title { color: theme('colors.ink.muted'); }
+  .pack-container-soon .pack-price-container { color: theme('colors.ink.DEFAULT'); }
+  .pack-container-soon .pack-price-container .pack-currency,
+  .pack-container-soon .pack-price-container .pack-period { color: theme('colors.ink.muted'); }
+  .pack-container-soon .pack-list p { color: theme('colors.ink.soft'); }
+  .pack-container-soon .pack-list-icon {
+    border-color: theme('colors.slate.200');
+    background-color: theme('colors.surface.muted');
+    color: theme('colors.ink.muted');
+  }
+  .pack-container-soon .pack-trial-note { color: theme('colors.ink.muted'); }
+}
+
+/* احترام به کاهش حرکت */
+@media (prefers-reduced-motion: reduce) {
+  .pack-container, .pack-container:hover,
+  .pack-button-container .pack-btn:active { transform: none !important; }
+}
+
+/* ============================================================
+   پولیش حرفه‌ای موبایل — لمسی، بدون زومِ ناخواسته، سازگار با نُچ
+   ============================================================ */
+
+/* iOS هنگام فوکوس روی فیلدی با فونت کوچک‌تر از ۱۶px کل صفحه را زوم می‌کند.
+   در موبایل فونت فیلدها را ۱۶px می‌کنیم تا این پرش رخ ندهد؛ ظاهر دسکتاپ دست‌نخورده می‌ماند. */
+@media (max-width: 640px) {
+  .input,
+  .search-field input,
+  input[type="text"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* هدف لمسی حداقل ۴۴px (توصیه‌ی اپل و گوگل برای انگشت) */
+  .input,
+  .search-field input,
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* رعایت ناحیه‌ی امنِ نُچ و نوار خانه در دستگاه‌های مدرن (iPhone X به بعد) */
+@supports (padding: max(0px, env(safe-area-inset-top))) {
+  /* هدر بازاریابی و نوار بالای داشبورد زیر نُچ پنهان نشوند */
+  .site-topbar,
+  .vt-topbar {
+    padding-top: env(safe-area-inset-top);
+  }
+  /* ناوبری شناور CardNav هم از نُچ فاصله بگیرد */
+  .card-nav-container {
+    top: calc(2em + env(safe-area-inset-top));
+  }
+  /* ساید‌بار داشبورد از نُچ و نوار خانه فاصله بگیرد */
+  .vt-sidebar {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* توستِ پیام‌ها زیر نُچ نرود */
+  .msg-toasts {
+    top: calc(5rem + env(safe-area-inset-top));
+  }
+}
+
+/* ============================================================
+   CardNav — پورت Vanilla از React Bits (نسخه‌ی JS + CSS)
+   ناوبری شناور (pill) صفحات عمومی؛ سازگار با RTL و فارسی.
+   انیمیشن power3.out نسخه‌ی GSAP با همان منحنیِ بزیه بازسازی شده،
+   پس وابستگی gsap لازم نیست: cubic-bezier(0.215, 0.61, 0.355, 1)
+   ============================================================ */
+@layer components {
+  /* فاصله‌گیر: چون ناو absolute است، جایش در چیدمان حفظ می‌شود */
+  .card-nav-spacer {
+    height: calc(60px + 2em + 0.75rem);
+  }
+
+  .card-nav-container {
+    position: absolute;
+    top: 2em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    z-index: 99;
+    box-sizing: border-box;
+  }
+
+  .card-nav {
+    display: block;
+    height: 60px;
+    padding: 0;
+    background-color: #fff;
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    will-change: height;
+    transition: height 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .card-nav-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.45rem 0.55rem 1.1rem;
+    z-index: 2;
+  }
+  /* در RTL اولین آیتم (همبرگر) سمت راست می‌نشیند؛ آینه‌ی درستِ نسخه‌ی اصلی */
+
+  .hamburger-menu {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 6px;
+    background: none;
+    border: 0;
+    padding: 0 0.25rem;
+    font: inherit;
+    color: #0f172a;
+  }
+
+  .hamburger-menu:hover .hamburger-line {
+    opacity: 0.75;
+  }
+  .hamburger-menu:focus-visible {
+    outline: 2px solid #1f47f5;
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  .hamburger-line {
+    width: 30px;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 999px;
+    transition:
+      transform 0.25s ease,
+      opacity 0.2s ease,
+      margin 0.3s ease;
+    transform-origin: 50% 50%;
+  }
+
+  .hamburger-menu.open .hamburger-line:first-child {
+    transform: translateY(4px) rotate(45deg);
+  }
+
+  .hamburger-menu.open .hamburger-line:last-child {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-decoration: none;
+  }
+
+  /* نشانِ متنی برند به‌جای فایل لوگو (خودکفا، بدون درخواست اضافه) */
+  .card-nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card-nav-brand-mark {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.65rem;
+    background-color: #1f47f5;
+    color: #fff;
+    box-shadow: 0 10px 40px -12px rgba(31, 71, 245, 0.35);
+  }
+  .card-nav-brand-mark svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+  .card-nav-brand-name {
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: #0f172a;
+  }
+
+  .card-nav-cta-button {
+    background-color: #1f47f5;
+    color: #fff;
+    border: none;
+    border-radius: calc(0.75rem - 0.35rem);
+    padding: 0 1rem;
+    height: 100%;
+    min-height: 44px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .card-nav-cta-button:hover {
+    background-color: #1735e1;
+  }
+  .card-nav-cta-button:focus-visible {
+    outline: 2px solid #1f47f5;
+    outline-offset: 2px;
+  }
+
+  .card-nav-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 60px;
+    bottom: 0;
+    padding: 0.5rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1;
+    transition: visibility 0s 0.4s;
+  }
+
+  .card-nav.open .card-nav-content {
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  .nav-card {
+    height: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: calc(0.75rem - 0.2rem);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    gap: 8px;
+    user-select: none;
+    opacity: 0;
+    transform: translateY(50px);
+    transition:
+      opacity 0.4s cubic-bezier(0.215, 0.61, 0.355, 1),
+      transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .card-nav.open .nav-card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav-card-label {
+    font-weight: 700;
+    font-size: 20px;
+    /* letter-spacing نسخه‌ی اصلی برای فارسی/عربی اتصال حروف را می‌شکند؛ صفر می‌ماند */
+    letter-spacing: 0;
+  }
+
+  .nav-card-links {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-card-link {
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-card-link:hover {
+    opacity: 0.75;
+  }
+  .nav-card-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  .nav-card-link-icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .card-nav-spacer {
+      height: calc(60px + 1.2em + 0.5rem);
+    }
+
+    .card-nav-container {
+      width: 90%;
+      top: 1.2em;
+    }
+
+    .card-nav-top {
+      padding: 0.5rem 1rem;
+      justify-content: space-between;
+    }
+
+    .hamburger-menu {
+      order: 2;
+    }
+
+    .logo-container {
+      position: static;
+      transform: none;
+      order: 1;
+    }
+
+    .card-nav-cta-button {
+      display: none;
+    }
+
+    .card-nav-content {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 0.5rem;
+      bottom: 0;
+      justify-content: flex-start;
+    }
+
+    .nav-card {
+      height: auto;
+      min-height: 60px;
+      flex: 1 1 auto;
+      max-height: none;
+    }
+
+    .nav-card-label {
+      font-size: 18px;
+    }
+
+    .nav-card-link {
+      font-size: 15px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-nav,
+  .nav-card,
+  .hamburger-line,
+  .card-nav-content {
+    transition: none !important;
+  }
+  .card-nav.open .nav-card {
+    transition-delay: 0s !important;
+  }
+}
+
+/* ============================================================
+   وبلاگ — تایپوگرافی مقاله، کاور و فهرست (سازگار RTL)
+   ============================================================ */
+@layer components {
+  /* --- نوار پیشرفت مطالعه (بالای صفحه‌ی مقاله) --- */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 60;
+    height: 3px;
+    background: transparent;
+    pointer-events: none;
+  }
+  .reading-progress > span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #f1830e, #1f47f5);
+    transform-origin: right center;
+    transform: scaleX(0);
+  }
+
+  /* --- کاور گرادیانی مقاله با نقش‌مایه --- */
+  .blog-cover {
+    position: relative;
+    overflow: hidden;
+    background-image: linear-gradient(135deg, #151d57 0%, #1f47f5 55%, #3366ff 100%);
+  }
+  .blog-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(to left, black 30%, transparent 90%);
+  }
+  .blog-cover-accent {
+    background-image: linear-gradient(135deg, #441505 0%, #d56309 55%, #f7a327 100%);
+  }
+  .blog-cover-growth {
+    background-image: linear-gradient(135deg, #022c22 0%, #047857 55%, #10b981 100%);
+  }
+
+  /* --- تایپوگرافی متن مقاله --- */
+  .prose-fa {
+    @apply text-ink-soft leading-8 text-[1.05rem];
+  }
+  .prose-fa > *:first-child { margin-top: 0; }
+  .prose-fa > *:last-child { margin-bottom: 0; }
+  .prose-fa p { margin-block: 1.1rem; }
+  .prose-fa h2 {
+    @apply text-ink font-black tracking-tight;
+    font-size: 1.5rem;
+    line-height: 2.2rem;
+    margin-block: 2.2rem 1rem;
+    scroll-margin-top: 6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .prose-fa h2::before {
+    content: "";
+    flex-shrink: 0;
+    width: 0.55rem;
+    height: 1.6rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #1f47f5, #f1830e);
+  }
+  .prose-fa h3 {
+    @apply text-ink font-extrabold tracking-tight;
+    font-size: 1.2rem;
+    line-height: 2rem;
+    margin-block: 1.8rem 0.75rem;
+    scroll-margin-top: 6rem;
+  }
+  .prose-fa a {
+    @apply text-brand-600 font-bold underline decoration-brand-200 underline-offset-4;
+  }
+  .prose-fa a:hover { @apply text-brand-700 decoration-brand-400; }
+  .prose-fa strong { @apply text-ink font-extrabold; }
+  .prose-fa ul, .prose-fa ol {
+    margin-block: 1.1rem;
+    padding-inline-start: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .prose-fa ul > li {
+    position: relative;
+    padding-inline-start: 1.6rem;
+  }
+  .prose-fa ul > li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.15rem;
+    top: 0.72em;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: #1f47f5;
+    box-shadow: 0 0 0 3px #d9e6ff;
+  }
+  .prose-fa ol { counter-reset: fa-ol; list-style: none; }
+  .prose-fa ol > li {
+    position: relative;
+    counter-increment: fa-ol;
+    padding-inline-start: 2.4rem;
+  }
+  .prose-fa ol > li::before {
+    content: counter(fa-ol);
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.15em;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 0.6rem;
+    background: #eef4ff;
+    color: #1f47f5;
+    font-size: 0.8rem;
+    font-weight: 900;
+  }
+  .prose-fa blockquote {
+    margin-block: 1.4rem;
+    padding: 1rem 1.25rem;
+    border-inline-start: 4px solid #f1830e;
+    border-radius: 0.9rem;
+    background: #fff8eb;
+    color: #762e11;
+    font-weight: 600;
+  }
+  .prose-fa table {
+    width: 100%;
+    margin-block: 1.4rem;
+    font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    display: block;
+    overflow-x: auto;
+  }
+  .prose-fa th, .prose-fa td {
+    padding: 0.7rem 1rem;
+    text-align: right;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+  .prose-fa thead th {
+    background: #0f172a;
+    color: #fff;
+    font-weight: 800;
+    border-bottom: 0;
+  }
+  .prose-fa tbody tr:last-child th,
+  .prose-fa tbody tr:last-child td { border-bottom: 0; }
+  .prose-fa tbody tr:nth-child(even) td { background: #f8fafc; }
+  .prose-fa img {
+    border-radius: 1rem;
+    margin-block: 1.4rem;
+  }
+  .prose-fa code {
+    font-size: 0.85em;
+    background: #f1f5f9;
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  /* --- فهرست مقاله (TOC) --- */
+  .toc-link {
+    @apply flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition-colors;
+  }
+  .toc-link:hover { @apply bg-brand-50 text-brand-700; }
+  .toc-link-l3 { padding-inline-start: 1.75rem; font-size: 0.82rem; }
+}

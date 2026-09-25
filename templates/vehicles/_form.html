@@ -1,0 +1,84 @@
+{# فیلدهای مشترک فرم خودرو — برند/مدل وابسته با Alpine، بقیه استاندارد #}
+{{ form.non_field_errors }}
+{{ form.models_by_brand|json_script:"models-by-brand" }}
+
+<div class="space-y-4"
+     x-data="{
+        brand: '{{ form.brand.value|default:'' }}',
+        model: '{{ form.model.value|default:'' }}',
+        models: JSON.parse(document.getElementById('models-by-brand').textContent),
+        get currentModels() { return this.models[this.brand] || [] },
+        onBrandChange() {
+            if (!this.currentModels.some(m => String(m.id) === String(this.model))) {
+                this.model = '';
+            }
+        }
+     }">
+
+    {# برند #}
+    <div class="field">
+        <label for="id_brand" class="label flex items-center gap-1.5">
+            {{ form.brand.label }}
+            <span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>
+        </label>
+        <select name="brand" id="id_brand" class="input" x-model="brand" @change="onBrandChange()">
+            <option value="">انتخاب برند…</option>
+            {% for b in form.brand.field.queryset %}
+            <option value="{{ b.id }}">{{ b.name }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.brand.errors %}
+        <p class="error-text flex items-center gap-1">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            {{ error }}
+        </p>
+        {% endfor %}
+    </div>
+
+    {# مدل — وابسته به برند #}
+    <div class="field">
+        <label for="id_model" class="label flex items-center gap-1.5">
+            {{ form.model.label }}
+            <span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>
+        </label>
+        <select name="model" id="id_model" class="input" x-model="model" :disabled="!brand">
+            <option value="" x-text="brand ? 'انتخاب مدل…' : 'اول برند را انتخاب کن…'"></option>
+            <template x-for="m in currentModels" :key="m.id">
+                <option :value="m.id" x-text="m.name"></option>
+            </template>
+        </select>
+        {% for error in form.model.errors %}
+        <p class="error-text flex items-center gap-1">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            {{ error }}
+        </p>
+        {% endfor %}
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% include 'partials/field.html' with field=form.year %}
+        {% include 'partials/field.html' with field=form.color %}
+    </div>
+
+    {% include 'partials/field.html' with field=form.fuel %}
+    {% include 'partials/field.html' with field=form.plate %}
+
+    {# تنظیمات سرویسِ این خودرو — اختیاری و جمع‌شونده #}
+    <div x-data="{ open: {% if form.service_interval_km.value or form.service_interval_months.value or form.preferred_oil.value %}true{% else %}false{% endif %} }"
+         class="rounded-2xl border border-slate-100 bg-surface-soft/50">
+        <button type="button" @click="open = !open"
+                class="flex w-full items-center gap-2 p-3 text-right">
+            <svg class="h-4 w-4 shrink-0 text-ink-muted transition-transform" :class="open ? 'rotate-90' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="font-bold flex-1">تنظیمات سرویس این خودرو</span>
+            <span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>
+        </button>
+        <div x-show="open" x-cloak x-transition class="border-t border-slate-100 p-3 space-y-4">
+            <p class="text-xs text-ink-muted">این مقادیر موقع ثبت تعویض روغن به‌صورت پیش‌فرض پر می‌شوند.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {% include 'partials/field.html' with field=form.service_interval_km %}
+                {% include 'partials/field.html' with field=form.service_interval_months %}
+            </div>
+            {% include 'partials/field.html' with field=form.preferred_oil %}
+        </div>
+    </div>
+</div>

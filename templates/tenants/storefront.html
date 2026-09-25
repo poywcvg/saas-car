@@ -1,0 +1,106 @@
+{% extends "tenants/base.html" %}
+{% load static %}
+
+{% block title %}{{ business.name }} — تعویض روغنی{% if business.city %} در {{ business.city }}{% endif %}{% endblock %}
+
+{% block content %}
+
+{# ===== هیرو ===== #}
+<section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50/70 to-transparent"></div>
+    <div class="container-app py-14 sm:py-20 grid lg:grid-cols-2 gap-10 items-center">
+
+        <div class="text-center lg:text-right">
+            <span class="inline-flex items-center gap-2 rounded-full border border-growth-200 bg-growth-50 px-3 py-1 text-sm font-bold text-growth-700">
+                <span class="relative flex h-2 w-2">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-growth-400 opacity-75"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-growth-500"></span>
+                </span>
+                باشگاه مشتریان {{ business.name }}
+            </span>
+
+            <h1 class="mt-5 text-3xl sm:text-4xl lg:text-5xl leading-tight">
+                خودروت رو به‌موقع
+                <span class="text-gradient">سرویس کن.</span>
+            </h1>
+
+            <p class="mt-4 text-lg text-ink-soft font-medium max-w-lg mx-auto lg:mx-0">
+                {{ business.tagline|default:"با یک جست‌وجوی ساده، وضعیت تعویض روغن و موعد سرویس بعدی خودروتان را ببینید." }}
+            </p>
+
+            <div class="mt-7 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
+                <a href="{% url 'tenants:lookup' %}" class="btn-primary btn-lg">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    پیگیری وضعیت خودرو
+                </a>
+                {% if business.phone %}
+                <a href="tel:{{ business.phone }}" class="btn-ghost btn-lg">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    تماس با ما
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="mt-6 flex items-center justify-center lg:justify-start gap-4 text-sm text-ink-muted font-medium">
+                <span class="inline-flex items-center gap-1.5">
+                    <svg class="h-4 w-4 text-growth-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    بدون نیاز به ثبت‌نام
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                    <svg class="h-4 w-4 text-growth-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    یادآوری پیامکی
+                </span>
+            </div>
+        </div>
+
+        <div class="relative">
+            <img src="{% static 'img/undraw/car-repair.svg' %}" alt="خدمات خودرو" class="w-full drop-shadow-xl">
+        </div>
+    </div>
+</section>
+
+{# ===== خدمات ===== #}
+{% if nav_products %}
+<section class="container-app py-12">
+    <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl">خدمات ما</h2>
+        <p class="mt-1 text-ink-soft font-medium">آنچه برای مراقبت از خودروی شما ارائه می‌دهیم</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+        {% for p in nav_products %}
+        <div class="card card-pad">
+            <span class="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ p.icon_svg|safe }}</svg>
+            </span>
+            <h3 class="mt-4 text-lg">{{ p.title }}</h3>
+            <p class="mt-1.5 text-sm text-ink-soft leading-relaxed">{{ p.tagline }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{# ===== نوار پیگیری ===== #}
+<section class="container-app pb-16">
+    <div class="rounded-3xl bg-brand-600 text-white px-6 py-10 sm:px-12 text-center relative overflow-hidden">
+        <div class="relative">
+            <h2 class="text-2xl sm:text-3xl text-white">نوبت سرویس بعدی‌ات کِیه؟</h2>
+            <p class="mt-2 text-white/80 font-medium max-w-md mx-auto">
+                شماره موبایل یا پلاک خودروت رو وارد کن و وضعیت رو ببین.
+            </p>
+            <a href="{% url 'tenants:lookup' %}" class="btn-lg mt-6 inline-flex items-center gap-2 rounded-xl bg-white text-brand-700 font-black px-6 py-3 hover:bg-brand-50 transition">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                پیگیری خودرو
+            </a>
+        </div>
+    </div>
+
+    {% if business.address %}
+    <p class="mt-6 text-center text-sm text-ink-muted inline-flex w-full items-center justify-center gap-1.5">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        {{ business.address }}
+    </p>
+    {% endif %}
+</section>
+
+{% endblock %}

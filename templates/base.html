@@ -1,0 +1,409 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1f47f5">
+    {# پسوند برند؛ سایتِ هر کسب‌وکار آن را خالی می‌کند تا برندِ خودش بماند. #}
+    <title>{% block title %}سرویسا{% endblock %}{% block title_suffix %} | سرویسا{% endblock %}</title>
+
+    {# ===== سئو: توضیح، نشانی متعارف و اشتراک‌گذاری ===== #}
+    <meta name="description" content="{% block meta_description %}سرویسا؛ نرم‌افزار مدیریت تعویض روغنی و خدمات خودرو — باشگاه مشتریان، سابقه‌ی سرویس و یادآوری پیامکی.{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}{{ seo_canonical }}{% endblock %}">
+    <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large{% endblock %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ seo_site_name }}">
+    <meta property="og:locale" content="fa_IR">
+    {# جنگو اجازه‌ی استفاده‌ی دوباره از یک بلوک را نمی‌دهد، پس og جداگانه تعریف شده #}
+    <meta property="og:title" content="{% block og_title %}سرویسا — نرم‌افزار تعویض روغنی و خدمات خودرو{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}باشگاه مشتریان، سابقه‌ی سرویس و یادآوری خودکار پیامکی برای تعویض روغنی‌ها.{% endblock %}">
+    <meta property="og:url" content="{{ seo_canonical }}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    {% block jsonld %}{% endblock %}
+
+    <link rel="preload" href="{% static 'fonts/iranyekan-regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/iranyekan-medium.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <script defer src="{% static 'js/alpine.min.js' %}"></script>
+    <script defer src="{% static 'js/card-nav.js' %}"></script>
+
+    {# پیش از رنگ‌آمیزی: تصمیم دربارهٔ پردهٔ برند و فعال‌سازی موتور موشن (بدون فلیکر) #}
+    <script>
+      (function () {
+        var el = document.documentElement;
+        var reduce = false;
+        try {
+          reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        } catch (e) {}
+        // پردهٔ برند فقط یک‌بار در هر نشست مرورگر
+        try {
+          if (reduce || sessionStorage.getItem("sv_curtain")) {
+            el.setAttribute("data-curtain", "seen");
+          } else {
+            sessionStorage.setItem("sv_curtain", "1");
+          }
+        } catch (e) {
+          el.setAttribute("data-curtain", "seen");
+        }
+        // موتور اسکرول‌ریویل فقط وقتی حرکت مجاز و IntersectionObserver موجود است
+        if (!reduce && "IntersectionObserver" in window) {
+          el.classList.add("anim");
+        }
+      })();
+    </script>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    {# ===== پردهٔ برند (یک‌بار در هر نشست) ===== #}
+    <div id="brand-curtain" aria-hidden="true">
+        <div class="mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+            <span class="name">سرویسا</span>
+        </div>
+        <div class="track"></div>
+    </div>
+
+    {# ===== نوار پیشرفت ناوبری ===== #}
+    <div id="nprogress" aria-hidden="true"><span></span></div>
+
+    {% block chrome %}
+    {% if user.is_authenticated %}
+    {# ===== ناوبری بالا (کاربران واردشده؛ بازدیدکنندگان ناشناس CardNav شناور می‌بینند) ===== #}
+    <header class="site-topbar sticky top-0 z-40 bg-surface/90 backdrop-blur border-b border-slate-100">
+        <nav class="container-app flex h-16 items-center justify-between gap-4" x-data="{ open: false }">
+
+            <a href="{% url 'home' %}" class="flex items-center gap-2 shrink-0">
+                <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+                </span>
+                <span class="text-lg font-black text-ink">سرویسا</span>
+            </a>
+
+            {# لینک‌های دسکتاپ #}
+            <div class="hidden md:flex items-center gap-1">
+                <a href="{% url 'businesses:dashboard' %}" class="btn-ghost">داشبورد</a>
+                <span class="mx-1 h-5 w-px bg-slate-200"></span>
+                <span class="hidden lg:inline text-sm text-ink-muted">{{ user.get_full_name|default:user.username }}</span>
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost">خروج</button>
+                </form>
+            </div>
+
+            {# دکمه‌ی منوی موبایل #}
+            <button @click="open = !open" class="md:hidden btn-ghost p-2" aria-label="منو">
+                <svg x-show="!open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg x-show="open" x-cloak class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+            </button>
+
+            {# منوی کشویی موبایل #}
+            <div x-show="open" x-cloak x-transition class="absolute inset-x-0 top-16 md:hidden bg-surface border-b border-slate-100 shadow-card">
+                <div class="container-app py-3 flex flex-col gap-1">
+                    <a href="{% url 'businesses:dashboard' %}" class="btn-ghost justify-start">داشبورد</a>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-ghost justify-start w-full">خروج</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+    {% else %}
+    {# ناوبری شناور CardNav (پورت Vanilla از React Bits) برای بازدیدکنندگان ناشناس #}
+    {% include "partials/card_nav.html" %}
+    {% endif %}
+    {% endblock %}
+
+    {# ===== پیام‌ها / توست (کامپوننت هشدار — سبک نوارِ کناری) ===== #}
+    {% if messages %}
+    <div class="msg-toasts fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 space-y-2" x-data>
+        {% for message in messages %}
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+             x-transition
+             role="alert"
+             class="flex items-center gap-2 rounded-lg p-3 shadow-card border-s-4
+                    transition duration-300 ease-in-out transform hover:scale-[1.02]
+                    {% if message.tags == 'success' %}bg-green-100 border-green-500 text-green-900 hover:bg-green-200
+                    {% elif message.tags == 'error' %}bg-red-100 border-red-500 text-red-900 hover:bg-red-200
+                    {% elif message.tags == 'warning' %}bg-amber-100 border-amber-500 text-amber-900 hover:bg-amber-200
+                    {% else %}bg-blue-100 border-blue-500 text-blue-900 hover:bg-blue-200{% endif %}">
+            {# آیکون متناسب با نوع پیام #}
+            {% if message.tags == 'success' %}
+            <svg class="h-5 w-5 shrink-0 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            {% elif message.tags == 'error' %}
+            <svg class="h-5 w-5 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            {% elif message.tags == 'warning' %}
+            <svg class="h-5 w-5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            {% else %}
+            <svg class="h-5 w-5 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            {% endif %}
+            <p class="flex-1 text-xs font-semibold leading-6">{{ message }}</p>
+            <button @click="show = false" class="shrink-0 opacity-60 hover:opacity-100" aria-label="بستن">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ===== محتوا ===== #}
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="site-footer mt-16">
+        <div class="container-app py-12">
+            <div class="grid gap-8 md:grid-cols-[1.4fr_1fr_1fr]">
+                {# برند + معرفی #}
+                <div>
+                    <a href="{% url 'home' %}" class="flex items-center gap-2 mb-3">
+                        <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+                        </span>
+                        <span class="text-lg font-black text-ink">سرویسا</span>
+                    </a>
+                    <p class="text-sm text-ink-muted leading-7 max-w-xs">
+                        پلتفرم باشگاه مشتریان و یادآوری سرویس برای کسب‌وکارهای خدمات خودرو — ساده، سریع و حرفه‌ای.
+                    </p>
+                </div>
+
+                {# لینک‌های سریع #}
+                <div>
+                    <h3 class="text-sm font-extrabold text-ink mb-3">دسترسی سریع</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/#products" class="footer-link">محصولات</a></li>
+                        <li><a href="/#features" class="footer-link">چرا سرویسا</a></li>
+                        <li><a href="{% url 'blog:index' %}" class="footer-link">وبلاگ</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'businesses:dashboard' %}" class="footer-link">داشبورد</a></li>
+                        {% else %}
+                        <li><a href="{% url 'accounts:login' %}" class="footer-link">ورود</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="footer-link">شروع رایگان</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {# تماس / شبکه‌ها #}
+                <div>
+                    <h3 class="text-sm font-extrabold text-ink mb-3">با ما در ارتباط باشید</h3>
+                    <div class="flex items-center gap-2">
+                        <a href="#" aria-label="اینستاگرام" class="footer-social">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="#" aria-label="تلگرام" class="footer-social">
+                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21.94 4.58 18.6 20.3c-.25 1.11-.92 1.38-1.86.86l-5.15-3.8-2.48 2.39c-.28.28-.5.5-1.03.5l.37-5.24 9.53-8.61c.41-.37-.09-.57-.64-.2L5.72 13.06.66 11.48c-1.1-.34-1.12-1.1.23-1.63l19.16-7.39c.92-.34 1.72.2 1.89 2.12z"/></svg>
+                        </a>
+                        <a href="#" aria-label="واتساپ" class="footer-social">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-muted">
+                <p>© {% now "Y" %} سرویسا — تمام حقوق محفوظ است</p>
+                <p>ساخته‌شده برای کسب‌وکارهای خدمات خودرو</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <style>[x-cloak]{display:none!important}[hidden]{display:none!important}</style>
+
+    {# ===== موتور اسکرول‌ریویل: عناصر هنگام ورود به دید جان می‌گیرند ===== #}
+    <script>
+      (function () {
+        var root = document.documentElement;
+        if (!root.classList.contains("anim") || !("IntersectionObserver" in window)) return;
+
+        function collect() {
+          var nodes = document.querySelectorAll(".reveal, .stagger > *, [data-reveal]");
+          // شمارهٔ ترتیبی درون هر گروهِ پلکانی برای تأخیر آبشاری
+          document.querySelectorAll(".stagger").forEach(function (group) {
+            var i = 0;
+            Array.prototype.forEach.call(group.children, function (child) {
+              child.style.setProperty("--i", i++);
+            });
+          });
+          return nodes;
+        }
+
+        function run() {
+          var nodes = collect();
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-in");
+                io.unobserve(entry.target);
+              }
+            });
+          }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
+
+          nodes.forEach(function (n) { io.observe(n); });
+
+          // تضمین ایمنی: اگر عنصری هرگز مشاهده نشد، بعد از مکث نمایش بده
+          setTimeout(function () {
+            nodes.forEach(function (n) { n.classList.add("is-in"); });
+          }, 2200);
+        }
+
+        // اگر پرده در حال نمایش است، بعد از کنار رفتنش شروع کن تا کوریوگرافی دیده شود
+        var curtainShowing = root.getAttribute("data-curtain") !== "seen";
+        var startFn = function () {
+          if (curtainShowing) { setTimeout(run, 1450); } else { run(); }
+        };
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", startFn);
+        } else {
+          startFn();
+        }
+      })();
+    </script>
+
+    {# ===== موشن ناوبری: نوار پیشرفت هنگام رفتن به صفحه‌ی بعد ===== #}
+    <script>
+      (function () {
+        var bar = document.getElementById("nprogress");
+        if (!bar) return;
+        var fill = bar.firstElementChild;
+        var timer;
+
+        function start() {
+          bar.classList.add("on");
+          fill.style.width = "0%";
+          // یک فریم بعد تا ترنزیشن اجرا شود
+          requestAnimationFrame(function () { fill.style.width = "80%"; });
+          clearTimeout(timer);
+          timer = setTimeout(function () { fill.style.width = "92%"; }, 600);
+        }
+
+        // شروع نوار هنگام کلیک روی لینک داخلی
+        document.addEventListener("click", function (e) {
+          if (e.defaultPrevented || e.button !== 0) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          var a = e.target.closest && e.target.closest("a[href]");
+          if (!a) return;
+          if (a.target && a.target !== "_self") return;
+          if (a.hasAttribute("download")) return;
+          var href = a.getAttribute("href");
+          if (!href || href[0] === "#" || href.indexOf("mailto:") === 0 ||
+              href.indexOf("tel:") === 0 || href.indexOf("sms:") === 0) return;
+          var url = new URL(a.href, location.href);
+          if (url.origin !== location.origin) return;
+          if (url.pathname === location.pathname && url.hash) return;
+          start();
+        });
+
+        // و هنگام ارسال فرم‌ها (ثبت مشتری، تعویض روغن و ...)
+        document.addEventListener("submit", function (e) {
+          if (e.defaultPrevented) return;
+          start();
+          // دکمهٔ ارسال را به حالتِ «در حال ارسال» (اسپینر) ببر
+          var btn = e.submitter ||
+                    e.target.querySelector('button[type="submit"], button:not([type])');
+          if (btn && btn.classList.contains("btn")) {
+            btn.classList.add("is-loading");
+            btn.setAttribute("aria-busy", "true");
+          }
+        });
+
+        // اگر کاربر با دکمه‌ی back برگشت، نوار را پاک کن (bfcache)
+        window.addEventListener("pageshow", function (ev) {
+          if (ev.persisted) { bar.classList.remove("on"); fill.style.width = "0%"; }
+        });
+      })();
+    </script>
+
+    {# پنجره‌ی تأیید برای کارهای مهم — با data-confirm="پیام" روی دکمه‌ی ارسال فعال می‌شود #}
+    <div id="confirm-modal" class="confirm-modal" hidden>
+      <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-msg">
+        <div class="confirm-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        </div>
+        <p id="confirm-msg" class="confirm-msg"></p>
+        <div class="confirm-actions">
+          <button type="button" class="btn-outline btn-lg" data-confirm-cancel>نه، بازگرد</button>
+          <button type="button" class="btn-danger btn-lg" data-confirm-ok>بله</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var modal = document.getElementById("confirm-modal");
+        if (!modal) return;
+        var msgEl = modal.querySelector(".confirm-msg");
+        var okBtn = modal.querySelector("[data-confirm-ok]");
+        var cancelBtn = modal.querySelector("[data-confirm-cancel]");
+        var pending = null, lastFocus = null;
+
+        function open(msg, onOk) {
+          msgEl.textContent = msg;
+          pending = onOk;
+          lastFocus = document.activeElement;
+          modal.hidden = false;
+          requestAnimationFrame(function () { modal.classList.add("is-open"); });
+          okBtn.focus();
+        }
+        function close() {
+          modal.classList.remove("is-open");
+          pending = null;
+          setTimeout(function () { modal.hidden = true; }, 200);
+          if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
+        okBtn.addEventListener("click", function () {
+          var fn = pending; close(); if (fn) fn();
+        });
+        cancelBtn.addEventListener("click", close);
+        modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !modal.hidden) close();
+        });
+        // پیش از ارسالِ فرم‌هایی که دکمه‌شان data-confirm دارد، تأیید بگیر
+        document.addEventListener("submit", function (e) {
+          var form = e.target;
+          if (form.__confirmed) { form.__confirmed = false; return; }
+          var trigger = (e.submitter && e.submitter.hasAttribute("data-confirm"))
+            ? e.submitter
+            : form.querySelector("[data-confirm]");
+          if (!trigger) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          open(trigger.getAttribute("data-confirm"), function () {
+            form.__confirmed = true;
+            if (form.requestSubmit) form.requestSubmit(trigger.type === "submit" ? trigger : undefined);
+            else form.submit();
+          });
+        }, true);
+      })();
+    </script>
+
+    {# موجِ کلیک روی دکمه‌ها (ripple — الهام از uiverse) #}
+    <script>
+      (function () {
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        document.addEventListener("click", function (e) {
+          var btn = e.target.closest(".btn");
+          if (!btn || btn.classList.contains("is-loading") || btn.disabled) return;
+          var rect = btn.getBoundingClientRect();
+          var size = Math.max(rect.width, rect.height);
+          var span = document.createElement("span");
+          span.className = "ripple";
+          span.style.width = span.style.height = size + "px";
+          span.style.left = (e.clientX - rect.left - size / 2) + "px";
+          span.style.top = (e.clientY - rect.top - size / 2) + "px";
+          btn.appendChild(span);
+          span.addEventListener("animationend", function () { span.remove(); });
+        });
+      })();
+    </script>
+</body>
+
+</html>

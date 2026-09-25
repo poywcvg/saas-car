@@ -1,0 +1,69 @@
+{% extends "dash_base.html" %}
+{% load jalali_tags %}
+
+{% block title %}یادآوری‌ها{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-4xl space-y-6">
+
+    {# ===== سربرگ ===== #}
+    <div class="reveal">
+        <h1 class="text-2xl sm:text-3xl flex items-center gap-2">
+            <svg class="h-7 w-7 text-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            یادآوری‌ها
+        </h1>
+        <p class="mt-1 text-sm text-ink-soft">
+            {% if total %}
+            <span class="num font-bold">{{ total|fa }}</span> خودرو نیاز به یادآوری تعویض روغن دارند. با یک لمس برایشان پیامک بفرست.
+            {% else %}
+            فعلاً همه‌چیز مرتب است.
+            {% endif %}
+        </p>
+    </div>
+
+    {% if not total %}
+    {# ===== حالت خالی ===== #}
+    <div class="reveal card card-pad text-center py-16">
+        <span class="grid h-16 w-16 mx-auto place-items-center rounded-3xl bg-green-50 text-ok mb-4">
+            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+        </span>
+        <h2 class="text-xl">هیچ یادآوری‌ای نداری</h2>
+        <p class="mt-1 text-sm text-ink-muted max-w-sm mx-auto">هیچ خودرویی نزدیک موعد یا گذشته از موعد نیست. عالیه!</p>
+        <a href="{% url 'businesses:dashboard' %}" class="btn-outline mt-5">بازگشت به داشبورد</a>
+    </div>
+    {% endif %}
+
+    {# ===== گذشته از موعد ===== #}
+    {% if overdue %}
+    <section class="reveal">
+        <h2 class="mb-3 flex items-center gap-2 text-lg text-danger">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            گذشته از موعد
+            <span class="badge-danger num">{{ overdue|length|fa }}</span>
+        </h2>
+        <div class="stagger space-y-3">
+            {% for item in overdue %}
+            {% include "businesses/_reminder_card.html" with item=item tone="danger" %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ===== نزدیک موعد ===== #}
+    {% if due_soon %}
+    <section class="reveal">
+        <h2 class="mb-3 flex items-center gap-2 text-lg text-warn">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            نزدیک موعد
+            <span class="badge-warn num">{{ due_soon|length|fa }}</span>
+        </h2>
+        <div class="stagger space-y-3">
+            {% for item in due_soon %}
+            {% include "businesses/_reminder_card.html" with item=item tone="warn" %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

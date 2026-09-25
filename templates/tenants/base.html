@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{# چرمِ سایتِ نماینده: برندِ خودِ کسب‌وکار، نه سرویسا #}
+{# عنوان با شهر، چون جست‌وجوی مشتری محلی است: «تعویض روغنی کرمان» #}
+{% block title %}{{ business.name }}{% if business.city %} — تعویض روغنی در {{ business.city }}{% endif %}{% endblock %}
+{% block title_suffix %}{% endblock %}
+
+{% block meta_description %}{{ business.name }}{% if business.city %}، تعویض روغنی در {{ business.city }}{% endif %}. {% if business.tagline %}{{ business.tagline }}. {% endif %}سابقه‌ی سرویس خودرو و یادآوری موعد تعویض روغن بعدی، آنلاین و بدون نصب اپ.{% endblock %}
+
+{% block og_title %}{{ business.name }}{% if business.city %} — تعویض روغنی در {{ business.city }}{% endif %}{% endblock %}
+{% block og_description %}{% if business.tagline %}{{ business.tagline }}{% else %}سابقه‌ی سرویس خودرو و یادآوری موعد تعویض روغن بعدی.{% endif %}{% endblock %}
+
+{% block jsonld %}{{ seo_local_ld }}{% endblock %}
+
+{% block chrome %}
+<header class="sticky top-0 z-40 bg-surface/90 backdrop-blur border-b border-slate-100">
+    <nav class="container-app flex h-16 items-center justify-between gap-4" x-data="{ open: false }">
+
+        <a href="/" class="flex items-center gap-2 shrink-0">
+            <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop font-black">
+                {{ business.name|first }}
+            </span>
+            <span class="text-lg font-black text-ink truncate max-w-[45vw]">{{ business.name }}</span>
+        </a>
+
+        {# لینک‌های دسکتاپ #}
+        <div class="hidden md:flex items-center gap-1">
+            <a href="/" class="btn-ghost">خانه</a>
+            <a href="{% url 'tenants:lookup' %}" class="btn-ghost">پیگیری خودرو</a>
+            {% if business.phone %}
+            <a href="tel:{{ business.phone }}" class="btn-primary">تماس</a>
+            {% endif %}
+        </div>
+
+        {# دکمه‌ی منوی موبایل #}
+        <button @click="open = !open" class="md:hidden btn-ghost p-2" aria-label="منو">
+            <svg x-show="!open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg x-show="open" x-cloak class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+        </button>
+
+        {# منوی کشویی موبایل #}
+        <div x-show="open" x-cloak x-transition class="absolute inset-x-0 top-16 md:hidden bg-surface border-b border-slate-100 shadow-card">
+            <div class="container-app py-3 flex flex-col gap-1">
+                <a href="/" class="btn-ghost justify-start">خانه</a>
+                <a href="{% url 'tenants:lookup' %}" class="btn-ghost justify-start">پیگیری خودرو</a>
+                {% if business.phone %}
+                <a href="tel:{{ business.phone }}" class="btn-primary justify-center">تماس با ما</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
+{% endblock %}
+
+{% block footer %}
+<footer class="site-footer mt-16">
+    <div class="container-app py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-ink-muted">
+        <p>© {% now "Y" %} {{ business.name }}</p>
+        <p class="inline-flex items-center gap-1">
+            قدرت‌ گرفته از
+            <a href="https://{{ TENANT_BASE_DOMAIN|default:'servisa.ir' }}" class="font-bold text-brand-600 footer-link">سرویسا</a>
+        </p>
+    </div>
+</footer>
+{% endblock %}

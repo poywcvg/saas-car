@@ -1,0 +1,54 @@
+{% extends "dash_base.html" %}
+
+{% block title %}جزئیات سفارش{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-lg space-y-6">
+
+    <div class="reveal">
+        <a href="{% url 'orders:list' %}" class="inline-flex items-center gap-1 text-sm font-bold text-ink-muted hover:text-ink transition mb-3">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            بازگشت به سفارشات
+        </a>
+        <h1 class="text-2xl sm:text-3xl">جزئیات سفارش</h1>
+    </div>
+
+    <div class="card card-pad space-y-4">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
+            </span>
+            <div>
+                <h2 class="text-lg font-bold">{{ order.product.title }}</h2>
+                {% if order.product.tagline %}
+                <p class="text-sm text-ink-soft">{{ order.product.tagline }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-ink-muted">فروشگاه</span>
+                <span class="text-sm font-bold">{{ order.business.name }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-ink-muted">وضعیت</span>
+                <span class="{% if order.status == 'confirmed' %}badge-growth{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-neutral{% endif %}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-ink-muted">تاریخ ثبت</span>
+                <span class="text-sm font-bold num">{{ order.created_at|date:"Y/m/d H:i" }}</span>
+            </div>
+            {% if order.note %}
+            <div class="pt-3 border-t border-slate-100">
+                <span class="text-sm text-ink-muted block mb-1">یادداشت</span>
+                <p class="text-sm">{{ order.note }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

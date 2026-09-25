@@ -1,0 +1,13 @@
+# خط‌پایان‌ها را در مخزن یک‌دست (LF) نگه می‌داریم
+* text=auto eol=lf
+
+# فایل‌های باینری دست‌نخورده بمانند
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.sqlite3 binary

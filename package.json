@@ -1,0 +1,13 @@
+{
+  "name": "car-saas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "پلتفرم SaaS باشگاه مشتریان خدمات خودرو",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/src/input.css -o ./static/css/app.css --minify",
+    "watch:css": "tailwindcss -i ./static/src/input.css -o ./static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

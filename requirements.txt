@@ -1,0 +1,6 @@
+# وابستگی‌های پایتونِ سرویسا — نصب: pip install -r requirements.txt
+Django==5.2.4
+python-dotenv==1.0.1
+
+# سرور WSGI برای استقرار در تولید (در توسعه لازم نیست)
+gunicorn==26.0.0

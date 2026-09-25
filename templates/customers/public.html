@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load jalali_tags %}
+
+{% block title %}وضعیت خودروی {{ customer.full_name }}{% endblock %}
+
+{# صفحه‌ی عمومی مشتری: بدون منوی داشبورد #}
+{% block chrome %}
+<header class="bg-brand-600 text-white">
+    <div class="container-app flex h-16 items-center gap-2">
+        <span class="grid h-9 w-9 place-items-center rounded-xl bg-white/15">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+        </span>
+        <span class="text-lg font-black">{{ customer.business.name }}</span>
+    </div>
+</header>
+{% endblock %}
+
+{% block footer %}
+<footer class="mt-12 py-6 text-center text-xs text-ink-muted">
+    <p>ارائه‌شده با <span class="font-bold text-brand-600">سرویسا</span></p>
+</footer>
+{% endblock %}
+
+{% block content %}
+<div class="container-app py-6 max-w-lg">
+
+    <div class="text-center mb-6">
+        <span class="grid h-16 w-16 mx-auto place-items-center rounded-3xl bg-brand-50 text-brand-600 text-2xl font-black mb-3">
+            {{ customer.full_name|first }}
+        </span>
+        <h1 class="text-2xl inline-flex items-center justify-center gap-2 flex-wrap">
+            سلام {{ customer.full_name }}
+            <svg class="h-6 w-6 text-warn shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+        </h1>
+        <p class="mt-1 text-ink-soft font-medium">وضعیت تعویض روغن خودروهای شما</p>
+    </div>
+
+    <div class="space-y-4">
+        {% for vehicle in customer.vehicles.all %}
+        <div class="card overflow-hidden">
+            {# نوار وضعیت رنگی بالای کارت #}
+            <div class="h-1.5
+                {% if vehicle.status == 'overdue' %}bg-danger{% elif vehicle.status == 'due_soon' %}bg-warn{% elif vehicle.status == 'ok' %}bg-ok{% else %}bg-slate-300{% endif %}"></div>
+
+            <div class="card-pad">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <svg class="h-6 w-6 text-ink-soft shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+                        <h2 class="text-lg truncate">{{ vehicle.title }}</h2>
+                    </div>
+                    <span class="{{ vehicle.status_meta.badge }} shrink-0">{{ vehicle.status_meta.label }}</span>
+                </div>
+
+                {% if vehicle.last_service_date %}
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center justify-between rounded-xl bg-surface-muted px-4 py-3">
+                        <span class="text-sm text-ink-soft">آخرین تعویض روغن</span>
+                        <span class="font-bold">{{ vehicle.last_service_date|jalali }}</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-xl px-4 py-3
+                        {% if vehicle.status == 'overdue' %}bg-red-50{% elif vehicle.status == 'due_soon' %}bg-amber-50{% else %}bg-green-50{% endif %}">
+                        <span class="text-sm font-semibold
+                            {% if vehicle.status == 'overdue' %}text-danger{% elif vehicle.status == 'due_soon' %}text-warn{% else %}text-ok{% endif %}">موعد تعویض بعدی</span>
+                        <span class="font-black
+                            {% if vehicle.status == 'overdue' %}text-danger{% elif vehicle.status == 'due_soon' %}text-warn{% else %}text-ok{% endif %}">{{ vehicle.effective_due_date|jalali }}</span>
+                    </div>
+
+                    {# کارکرد تا تعویض بعدی #}
+                    {% if vehicle.next_due_km %}
+                    <div class="rounded-xl bg-surface-muted px-4 py-3">
+                        <div class="flex items-center justify-between text-sm mb-2">
+                            <span class="text-ink-soft">کارکرد تا تعویض بعدی</span>
+                            {% with rem=vehicle.km_remaining %}
+                            <span class="font-bold num {% if rem < 0 %}text-danger{% elif rem <= 500 %}text-warn{% else %}text-ink{% endif %}">
+                                {% if rem < 0 %}{{ rem|absval|fa }} کیلومتر گذشته{% else %}{{ rem|fa }} کیلومتر مانده{% endif %}
+                            </span>
+                            {% endwith %}
+                        </div>
+                        {% with pct=vehicle.km_progress_percent %}
+                        <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+                            <div class="h-full rounded-full {% if pct >= 100 %}bg-danger{% elif pct >= 90 %}bg-warn{% else %}bg-brand-500{% endif %}"
+                                 style="width: {{ pct }}%"></div>
+                        </div>
+                        {% endwith %}
+                        <p class="text-xs text-ink-muted num mt-2 text-center">
+                            تخمین کارکرد امروز: {{ vehicle.estimated_current_mileage|fa }} کیلومتر
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    {% with d=vehicle.days_until_due %}
+                    <p class="flex items-center justify-center gap-1.5 text-center text-sm font-bold pt-1
+                        {% if d < 0 %}text-danger{% elif d <= 14 %}text-warn{% else %}text-ok{% endif %}">
+                        {% if d < 0 %}
+                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        {{ d|absval|fa }} روز از موعد گذشته — لطفاً برای تعویض روغن مراجعه کنید
+                        {% elif d == 0 %}
+                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>
+                        موعد تعویض روغن همین امروز است
+                        {% else %}
+                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                        {{ d|fa }} روز تا موعد بعدی
+                        {% endif %}
+                    </p>
+                    {% endwith %}
+                </div>
+                {% else %}
+                <p class="mt-4 text-sm text-ink-muted text-center bg-surface-muted rounded-xl px-4 py-3">هنوز سابقه‌ای ثبت نشده است.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="card card-pad text-center text-ink-muted py-10">
+            <p>هنوز خودرویی ثبت نشده است.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# تماس با تعمیرگاه #}
+    {% if customer.business.owner.phone %}
+    <a href="tel:{{ customer.business.owner.phone }}" class="btn-primary btn-block btn-lg mt-6">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        تماس با {{ customer.business.name }}
+    </a>
+    {% endif %}
+
+</div>
+{% endblock %}

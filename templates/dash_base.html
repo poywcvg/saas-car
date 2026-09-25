@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static jalali_tags %}
+
+{# صفحه‌های پنل مدیریت: ساید‌بار + نوار بالا به‌جای هدر بازاریابی #}
+{# پنل خصوصی است؛ نباید در گوگل ایندکس شود. #}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block chrome %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+{% with vn=request.resolver_match.view_name ns=request.resolver_match.namespace %}
+<div x-data="{ open: false }" @keydown.escape.window="open = false"
+     class="flex h-screen overflow-hidden">
+
+  {# پس‌زمینه‌ی تیره هنگام باز بودن منوی موبایل #}
+  <div x-show="open" x-cloak x-transition.opacity @click="open = false"
+       class="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden"></div>
+
+  {# ===== ساید‌بار ===== #}
+  <aside
+    class="vt-sidebar fixed inset-y-0 right-0 z-50 flex w-72 max-w-[85vw] flex-col
+           border-l border-slate-100 bg-surface transition-transform duration-300 ease-out
+           lg:w-64 lg:translate-x-0"
+    :class="open ? 'translate-x-0' : 'translate-x-full'">
+
+    {# لوگو #}
+    <div class="flex h-16 shrink-0 items-center justify-between gap-2 px-5 border-b border-slate-100">
+      <a href="{% url 'businesses:dashboard' %}" class="flex items-center gap-2">
+        <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+        </span>
+        <span class="text-lg font-black text-ink">سرویسا</span>
+      </a>
+      {# بستن در موبایل #}
+      <button @click="open = false" class="lg:hidden btn-ghost p-2" aria-label="بستن منو">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    {# لینک‌های ناوبری (اسکرول مستقل) #}
+    <nav class="flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-1">
+      <p class="px-3 pb-1 text-xs font-bold text-ink-muted">منو</p>
+
+      <a href="{% url 'businesses:dashboard' %}"
+         class="nav-link {% if vn == 'businesses:dashboard' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        داشبورد
+      </a>
+
+      <a href="{% url 'customers:list' %}"
+         class="nav-link {% if ns == 'customers' and vn != 'customers:add' or ns == 'vehicles' or ns == 'oilchange' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        مشتریان
+      </a>
+
+      {% if nav_role == 'owner' or nav_role == 'manager' %}
+      <a href="{% url 'accounts:team' %}"
+         class="nav-link {% if vn == 'accounts:team' or vn == 'accounts:team_edit' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        اعضای تیم
+      </a>
+      {% endif %}
+
+      <a href="{% url 'catalog:products' %}"
+         class="nav-link {% if ns == 'catalog' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+        محصولات
+      </a>
+
+      <a href="{% url 'garage:settings' %}"
+         class="nav-link {% if ns == 'garage' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+        تنظیمات خودرو
+      </a>
+
+      <a href="{% url 'businesses:reminders' %}"
+         class="nav-link {% if vn == 'businesses:reminders' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        یادآوری‌ها
+        {% if nav_reminder_count %}
+        <span class="mr-auto inline-flex min-w-5 items-center justify-center rounded-full bg-danger px-1.5 py-0.5 text-xs font-black text-white num"
+              {% if vn == 'businesses:reminders' %}style="background:rgba(255,255,255,.25)"{% endif %}>{{ nav_reminder_count|fa }}</span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'orders:list' %}"
+         class="nav-link {% if ns == 'orders' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        سفارشات
+      </a>
+
+      <a href="{% url 'customers:add' %}"
+         class="nav-link {% if vn == 'customers:add' %}nav-link-active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+        افزودن مشتری
+      </a>
+    </nav>
+
+  </aside>
+
+  {# ===== ناحیه‌ی محتوا ===== #}
+  <div class="flex-1 flex flex-col min-h-0 lg:mr-64">
+
+    {# نوار بالا #}
+    <header class="vt-topbar shrink-0 h-16 flex items-center gap-3 px-4 sm:px-6 border-b border-slate-100 bg-surface/85 backdrop-blur z-30">
+      <button @click="open = true" class="lg:hidden btn-ghost gap-1.5 px-2.5 py-2" aria-label="باز کردن منو">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span class="text-sm font-bold">منو</span>
+      </button>
+
+      {# جست‌وجوی سریع مشتری #}
+      <form method="get" action="{% url 'customers:list' %}" class="search-field search-field-sm flex-1 max-w-md">
+        <button type="submit" aria-label="جست‌وجو">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="جست‌وجوی نام یا شماره مشتری…" />
+      </form>
+
+      {# آواتار کاربر + منوی کشویی (دسکتاپ) #}
+      <div class="relative mr-auto hidden sm:block"
+           x-data="{ pOpen: false }"
+           @keydown.escape.window="pOpen = false">
+        <button type="button"
+                @click="pOpen = !pOpen"
+                :aria-expanded="pOpen"
+                aria-label="منوی کاربر"
+                class="flex items-center gap-2 rounded-xl p-1 pl-2 transition hover:bg-surface-soft"
+                :class="pOpen ? 'bg-surface-soft' : ''">
+          <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600 font-black">
+            {{ user.username|first|upper }}
+          </span>
+          <svg class="h-4 w-4 text-ink-muted transition-transform" :class="pOpen ? 'rotate-180' : ''"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+
+        {# پنل کشویی #}
+        <div x-show="pOpen" x-cloak
+             @click.away="pOpen = false"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-1"
+             class="absolute top-full left-0 mt-2 w-60 rounded-2xl border border-slate-100 bg-surface p-2 shadow-pop z-50">
+
+          {# سرِ پنل: هویت کاربر #}
+          <div class="flex items-center gap-3 rounded-xl bg-surface-soft px-3 py-2.5 mb-1">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-600 text-white font-black">
+              {{ user.username|first|upper }}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-bold">{{ user.get_full_name|default:user.username }}</p>
+              <p class="truncate text-xs text-ink-muted">{{ nav_business.name|default:'کسب‌وکار من' }}</p>
+            </div>
+          </div>
+
+          <a href="{% url 'businesses:dashboard' %}"
+             class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-ink-soft transition hover:bg-surface-soft">
+            <svg class="h-5 w-5 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            داشبورد
+          </a>
+
+          <a href="{% url 'businesses:reminders' %}"
+             class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-ink-soft transition hover:bg-surface-soft">
+            <svg class="h-5 w-5 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            یادآوری‌ها
+          </a>
+
+          <a href="{% url 'accounts:profile' %}"
+             class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-ink-soft transition hover:bg-surface-soft">
+            <svg class="h-5 w-5 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            پروفایل
+          </a>
+
+          <div class="my-1 border-t border-slate-100"></div>
+
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-danger transition hover:bg-red-50"
+                    data-confirm="از حساب خارج می‌شوید؟">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              خروج از حساب
+            </button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    {# محتوای هر صفحه (اسکرول مستقل) #}
+    <main class="flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      {% block app_content %}{% endblock %}
+    </main>
+
+    <footer class="shrink-0 px-6 py-5 text-center text-xs text-ink-muted">
+      © {% now "Y" %} سرویسا — باشگاه مشتریان خدمات خودرو
+    </footer>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

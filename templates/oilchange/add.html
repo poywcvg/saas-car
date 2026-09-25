@@ -1,0 +1,190 @@
+{% extends "dash_base.html" %}
+{% load jalali_tags %}
+
+{% block title %}ثبت تعویض روغن{% endblock %}
+
+{% block app_content %}
+<div class="reveal mx-auto max-w-xl"
+     x-data="oilCalc({
+        mileage: Number('{{ form.mileage_km.value|default:0 }}') || 0,
+        intervalKm: Number('{{ form.interval_km.value|default:5000 }}') || 5000,
+        intervalMonths: Number('{{ form.interval_months.value|default:3 }}') || 3,
+        dailyKm: {{ daily_km|default:45 }},
+        lastMileage: {{ last_mileage|default:0 }}
+     })">
+
+    <a href="{% url 'customers:detail' pk=customer.pk %}" class="inline-flex items-center gap-1 text-sm font-bold text-ink-muted hover:text-ink mb-4">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        {{ customer.full_name }}
+    </a>
+
+    <div class="flex items-center gap-3 mb-6">
+        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-50 text-accent-600">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 7h-4z"/><path d="M6 12h12l-1 8H7z"/></svg>
+        </span>
+        <div>
+            <h1 class="text-2xl sm:text-3xl">ثبت تعویض روغن</h1>
+            <p class="text-ink-soft font-medium">{{ vehicle.title }}</p>
+        </div>
+    </div>
+
+    {# نکتهٔ تخمین کارکرد — فقط وقتی سابقه داریم #}
+    {% if estimated_mileage %}
+    <div class="rounded-xl bg-brand-50/60 border border-brand-100 px-4 py-3 mb-4 flex items-start gap-2 text-sm">
+        <svg class="h-5 w-5 shrink-0 text-brand-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v-4"/><path d="M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <p class="text-ink-soft leading-6">
+            کارکرد امروز بر پایهٔ میانگین <span class="font-bold text-ink" x-text="fa(dailyKm)"></span> کیلومتر در روز،
+            حدوداً <span class="font-extrabold text-brand-700" x-text="fa(estCurrent)"></span> کیلومتر تخمین زده شد.
+            در صورت نیاز اصلاحش کن.
+        </p>
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="rounded-xl bg-red-50 border border-red-100 p-3 space-y-1 mb-4">
+            {% for error in form.non_field_errors %}
+            <p class="error-text">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# اطلاعات اصلی #}
+        <div class="card card-pad space-y-4">
+            {% include 'partials/field.html' with field=form.service_date %}
+            {% include 'partials/field.html' with field=form.mileage_km %}
+            {% include 'partials/field.html' with field=form.oil_name %}
+        </div>
+
+        {# موعد بعدی #}
+        <div class="card card-pad space-y-4 mt-4">
+            <div class="flex items-center gap-2">
+                <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </span>
+                <div>
+                    <h2 class="text-base">موعد تعویض بعدی</h2>
+                    <p class="text-xs text-ink-muted">اپراتور تعیین می‌کند — کیلومتر و زمان</p>
+                </div>
+            </div>
+
+            {# دکمه‌های پیش‌فرض کیلومتر + امکان مقدار دلخواه #}
+            <div>
+                <label class="block text-sm font-bold text-ink-soft mb-2">فاصله تا تعویض بعدی (کیلومتر)</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <template x-for="km in presetKm" :key="km">
+                        <button type="button"
+                                @click="intervalKm = km"
+                                class="px-3 py-1.5 rounded-lg text-sm font-bold border transition"
+                                :class="intervalKm === km
+                                    ? 'bg-brand-600 text-white border-brand-600'
+                                    : 'bg-white text-ink-soft border-slate-200 hover:border-brand-300'"
+                                x-text="fa(km)"></button>
+                    </template>
+                </div>
+                {{ form.interval_km }}
+                {% for error in form.interval_km.errors %}
+                <p class="error-text mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            {% include 'partials/field.html' with field=form.interval_months %}
+        </div>
+
+        {# ماشین‌حساب حرفه‌ای زنده #}
+        <div class="card card-pad mt-4 bg-gradient-to-br from-ink to-ink-soft text-white">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="grid h-9 w-9 place-items-center rounded-xl bg-white/15">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M8 18h8"/></svg>
+                </span>
+                <div>
+                    <h2 class="text-base text-white">محاسبهٔ حرفه‌ای موعد</h2>
+                    <p class="text-xs text-white/60">با تغییر مقادیر، زنده به‌روز می‌شود</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/10 p-3">
+                    <p class="text-xs text-white/60 mb-1">کیلومتر موعد بعدی</p>
+                    <p class="text-lg font-extrabold" x-text="fa(nextDueKm) + ' km'"></p>
+                </div>
+                <div class="rounded-xl bg-white/10 p-3">
+                    <p class="text-xs text-white/60 mb-1">تخمین موعد</p>
+                    <p class="text-lg font-extrabold" x-text="daysToLabel"></p>
+                </div>
+            </div>
+
+            {# مقایسهٔ دو معیار: کدام زودتر می‌رسد #}
+            <div class="mt-3 space-y-2">
+                <div class="flex items-center justify-between rounded-lg px-3 py-2 text-sm"
+                     :class="kmSooner ? 'bg-brand-500/30 ring-1 ring-brand-300/40' : 'bg-white/5'">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="h-4 w-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        بر پایهٔ کیلومتر
+                    </span>
+                    <span class="font-bold" x-text="'~' + fa(daysByKm) + ' روز'"></span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg px-3 py-2 text-sm"
+                     :class="!kmSooner ? 'bg-brand-500/30 ring-1 ring-brand-300/40' : 'bg-white/5'">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="h-4 w-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                        بر پایهٔ زمان
+                    </span>
+                    <span class="font-bold" x-text="fa(intervalMonths) + ' ماه (~' + fa(daysByDate) + ' روز)'"></span>
+                </div>
+                <p class="text-xs text-white/60 pt-1 leading-6">
+                    موعد مؤثر هرکدام که <span class="font-bold text-white">زودتر</span> برسد:
+                    <span class="font-extrabold text-brand-200"
+                          x-text="kmSooner ? 'کیلومتر (~' + fa(daysByKm) + ' روز دیگر)' : 'زمان (' + fa(intervalMonths) + ' ماه دیگر)'"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card card-pad mt-4">
+            {% include 'partials/field.html' with field=form.note %}
+        </div>
+
+        <button type="submit" class="btn-primary btn-block btn-lg mt-6">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            ثبت تعویض روغن
+        </button>
+    </form>
+
+</div>
+
+<script>
+function oilCalc(init) {
+    return {
+        mileage: init.mileage,
+        intervalKm: init.intervalKm,
+        intervalMonths: init.intervalMonths,
+        dailyKm: init.dailyKm || 45,
+        lastMileage: init.lastMileage || 0,
+        estCurrent: init.mileage,
+        presetKm: [3000, 5000, 7000, 8000, 10000],
+
+        // ارقام فارسی + جداکنندهٔ هزارگان
+        fa(n) {
+            if (n === null || n === undefined || isNaN(n)) return '—';
+            const s = Math.round(n).toLocaleString('en-US');
+            return s.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        },
+
+        get nextDueKm() { return (this.mileage || 0) + (this.intervalKm || 0); },
+        get daysByKm() {
+            return this.dailyKm > 0 ? Math.round((this.intervalKm || 0) / this.dailyKm) : 0;
+        },
+        get daysByDate() { return Math.round((this.intervalMonths || 0) * 30.4); },
+        get kmSooner() { return this.daysByKm <= this.daysByDate; },
+        get effectiveDays() { return Math.min(this.daysByKm, this.daysByDate); },
+        get daysToLabel() {
+            const d = this.effectiveDays;
+            if (d >= 60) return this.fa(Math.round(d / 30.4)) + ' ماه';
+            return this.fa(d) + ' روز';
+        },
+    };
+}
+</script>
+{% endblock %}

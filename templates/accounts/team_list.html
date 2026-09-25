@@ -1,0 +1,67 @@
+{% extends "dash_base.html" %}
+
+{% block title %}اعضای تیم{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-3xl space-y-6">
+
+    <div class="reveal">
+        <h1 class="text-2xl sm:text-3xl">اعضای تیم</h1>
+        <p class="mt-1 text-ink-soft font-medium">
+            {{ business.name }} — مشخصات اعضا را ببینید و ویرایش کنید.
+        </p>
+    </div>
+
+    <div class="reveal card card-pad">
+        {% if members %}
+        <div class="divide-y divide-slate-100">
+            {% for m in members %}
+            <div class="flex items-center gap-3 py-3.5 first:pt-0 last:pb-0">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 font-black">
+                    {{ m.user.username|first|upper }}
+                </span>
+                <div class="min-w-0 flex-1">
+                    <p class="font-bold truncate">
+                        {{ m.user.get_full_name|default:m.user.username }}
+                        {% if m.user_id == user.id %}
+                        <span class="pill !py-0.5 !px-2 !text-[0.65rem] mr-1">شما</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-xs text-ink-muted truncate" dir="ltr">@{{ m.user.username }}{% if m.user.phone %} · {{ m.user.phone }}{% endif %}</p>
+                </div>
+                <div class="flex shrink-0 flex-col items-end gap-1.5">
+                    {% if m.role == 'owner' %}
+                    <span class="badge-brand">مالک</span>
+                    {% elif m.role == 'manager' %}
+                    <span class="badge-growth">مدیر</span>
+                    {% else %}
+                    <span class="badge-neutral">کارمند</span>
+                    {% endif %}
+                    {% if m.user.is_active %}
+                    <span class="badge-ok">فعال</span>
+                    {% else %}
+                    <span class="badge-danger">غیرفعال</span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'accounts:team_edit' pk=m.user_id %}"
+                   class="btn-outline !px-3.5 !py-2 text-xs shrink-0"
+                   aria-label="ویرایش {{ m.user.get_full_name|default:m.user.username }}">
+                    ویرایش
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-ink-muted">هنوز عضوی ثبت نشده است.</p>
+        {% endif %}
+    </div>
+
+    {% if my_role != 'owner' %}
+    <p class="reveal text-xs text-ink-muted font-medium">
+        تغییر نقش، وضعیت فعالیت و حذف اعضا فقط با دسترسی مالک انجام می‌شود.
+    </p>
+    {% endif %}
+
+</div>
+{% endblock %}

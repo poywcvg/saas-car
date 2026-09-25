@@ -1,0 +1,108 @@
+{# کارت قیمت محصول — اقتباس از Uiverse (marwam112010)، راست‌چین و فارسی‌شده #}
+{# ورودی‌ها: product (مدل Product)، cta_url (اختیاری)، cta_label (اختیاری) #}
+{% with cta_url=cta_url|default:"" cta_label=cta_label|default:"شروع رایگان" %}
+{% if product.is_available %}
+<div class="pack-container {% if product.is_flagship %}pack-container-flagship{% endif %}">
+  <div class="pack-header">
+    {% if product.icon_svg %}
+    <span class="pack-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
+    </span>
+    {% endif %}
+    <p class="pack-title">
+      {{ product.title }}
+      {% if product.is_flagship %}
+      <span class="pack-trial-badge">۷ روز اول رایگان</span>
+      {% endif %}
+    </p>
+    {# قیمت: فقط برای تعویض روغن (پرچم‌دار) اشتراک ماهانه نمایش بده #}
+    {% if product.slug == "oil-change" or product.is_flagship %}
+    <div class="pack-price-container" aria-label="۴۹ هزار تومان در ماه">
+      <span class="pack-currency">تومان</span>
+      <span class="num">۴۹٬۰۰۰</span>
+      <span class="pack-period">/ماه</span>
+    </div>
+    <p class="pack-trial-note">۷ روز اول کاملا رایگان، بدون کارت بانکی</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <ul class="pack-lists">
+      <li class="pack-list">
+        <span class="pack-list-icon">
+          <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <p>۷ روز اول رایگان، بدون محدودیت امکانات</p>
+      </li>
+      <li class="pack-list">
+        <span class="pack-list-icon">
+          <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <p>ثبت نامحدود مشتری و خودرو + سابقه‌ی کامل سرویس</p>
+      </li>
+      <li class="pack-list">
+        <span class="pack-list-icon">
+          <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <p>یادآوری خودکار پیامکی سرِ موعد سرویس</p>
+      </li>
+      <li class="pack-list">
+        <span class="pack-list-icon">
+          <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <p>پشتیبانی فنی + لغو هر زمان</p>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pack-button-container">
+    {% if cta_url %}
+    <a href="{{ cta_url }}" class="pack-btn text-center">{{ cta_label }}</a>
+    {% else %}
+    <a href="{% url 'accounts:register' %}" class="pack-btn text-center">{{ cta_label }}</a>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+{# نسخه‌ی روشن برای محصولات «به‌زودی» — همان ساختار Uiverse #}
+<div class="pack-container pack-container-soon">
+  <div class="pack-header">
+    {% if product.icon_svg %}
+    <span class="pack-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
+    </span>
+    {% endif %}
+    <p class="pack-title">{{ product.title }} — به‌زودی</p>
+    <div class="pack-price-container" aria-hidden="true">
+      <span class="pack-currency">…</span>
+      <span class="num">؟</span>
+      <span class="pack-period"></span>
+    </div>
+    <p class="pack-trial-note">{{ product.tagline|default:"در دست توسعه" }}</p>
+  </div>
+  <div>
+    <ul class="pack-lists">
+      <li class="pack-list">
+        <span class="pack-list-icon">
+          <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <p>{{ product.description|default:"این محصول به‌زودی به سرویسا اضافه می‌شود."|truncatechars:80 }}</p>
+      </li>
+    </ul>
+  </div>
+  <div class="pack-button-container">
+    <span class="pack-btn text-center !bg-surface-muted !text-ink-muted" aria-disabled="true">در دست توسعه</span>
+  </div>
+</div>
+{% endif %}
+{% endwith %}

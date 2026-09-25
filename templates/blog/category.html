@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load jalali_tags %}
+
+{# صفحه‌ی دسته‌بندی وبلاگ: هاب موضوعی برای سئو (مثل «روغن موتور»). #}
+
+{% block title %}{{ category.title }} — وبلاگ سرویسا{% endblock %}
+
+{% block meta_description %}{% if category.description %}{{ category.description }}{% else %}همه‌ی مقالات {{ category.title }}: آموزش‌های کاربردی نگهداری خودرو از وبلاگ سرویسا.{% endif %}{% endblock %}
+
+{% block canonical %}{{ canonical }}{% endblock %}
+
+{% block og_title %}{{ category.title }} — وبلاگ سرویسا{% endblock %}
+{% block og_description %}{% if category.description %}{{ category.description }}{% else %}مقالات آموزشی {{ category.title }} در وبلاگ سرویسا.{% endif %}{% endblock %}
+
+{% block jsonld %}{{ jsonld_crumbs }}{{ jsonld_blog }}{% endblock %}
+
+{% block content %}
+
+{# ===== سربرگ دسته ===== #}
+<section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50/90 via-surface to-surface-soft"></div>
+    <div class="absolute -top-24 -left-24 -z-10 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"></div>
+
+    <div class="container-app py-12 sm:py-16">
+        <nav class="mb-5 flex items-center gap-2 text-sm text-ink-muted font-medium" aria-label="مسیر راهنما">
+            <a href="/" class="hover:text-brand-600">سرویسا</a>
+            <span aria-hidden="true">/</span>
+            <a href="{% url 'blog:index' %}" class="hover:text-brand-600">وبلاگ</a>
+            <span aria-hidden="true">/</span>
+            <span class="text-ink" aria-current="page">{{ category.title }}</span>
+        </nav>
+
+        <div class="flex items-center gap-4">
+            {% if category.icon_svg %}
+            <span class="grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-brand-600 text-white shadow-pop">
+                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ category.icon_svg|safe }}</svg>
+            </span>
+            {% endif %}
+            <div>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.25] tracking-tight">
+                    {{ category.title }}
+                </h1>
+                <p class="mt-2 text-sm text-ink-muted font-semibold">
+                    <span class="num">{{ posts.paginator.count|fa }}</span> مقاله
+                </p>
+            </div>
+        </div>
+
+        {% if category.description %}
+        <p class="mt-5 text-lg text-ink-soft font-medium leading-relaxed max-w-2xl">
+            {{ category.description }}
+        </p>
+        {% endif %}
+
+        {# دسته‌های دیگر #}
+        {% if categories %}
+        <div class="mt-6 flex flex-wrap gap-2">
+            <a href="{% url 'blog:index' %}" class="pill">همه</a>
+            {% for c in categories %}
+            <a href="{{ c.get_absolute_url }}" class="pill {% if c.pk == category.pk %}!bg-ink !text-white{% else %}hover:!bg-brand-50 hover:!text-brand-700{% endif %}">
+                {{ c.title }}
+                <span class="num text-xs opacity-70">{{ c.n|fa }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# ===== مقالات دسته ===== #}
+<section class="container-app py-10 sm:py-14">
+    {% if posts %}
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {% for p in posts %}
+        {% include "blog/_card.html" with p=p %}
+        {% endfor %}
+    </div>
+
+    {% if posts.paginator.num_pages > 1 %}
+    <nav class="mt-10 flex items-center justify-center gap-2" aria-label="صفحه‌بندی مقالات">
+        {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}" class="btn-outline !px-4" aria-label="صفحه‌ی قبلی">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        {% endif %}
+        {% for n in posts.paginator.page_range %}
+        {% if n == posts.number %}
+        <span class="btn-primary !px-4 num" aria-current="page">{{ n|fa }}</span>
+        {% else %}
+        <a href="?page={{ n }}" class="btn-outline !px-4 num">{{ n|fa }}</a>
+        {% endif %}
+        {% endfor %}
+        {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}" class="btn-outline !px-4" aria-label="صفحه‌ی بعدی">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        {% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="card card-pad text-center max-w-xl mx-auto">
+        <p class="text-lg font-black text-ink">هنوز مقاله‌ای در این دسته نیست.</p>
+        <p class="mt-2 text-ink-muted">به‌زودی مقالات تازه منتشر می‌شود.</p>
+        <a href="{% url 'blog:index' %}" class="btn-primary mt-5">همه‌ی مقالات</a>
+    </div>
+    {% endif %}
+</section>
+
+{% include "blog/_cta.html" %}
+
+{% endblock %}

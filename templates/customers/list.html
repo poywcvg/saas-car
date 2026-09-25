@@ -1,0 +1,74 @@
+{% extends "dash_base.html" %}
+{% load jalali_tags %}
+
+{% block title %}مشتریان{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-2xl">
+
+    <div class="reveal flex items-center justify-between gap-4 mb-5">
+        <div>
+            <p class="text-sm text-ink-muted">{{ business.name }}</p>
+            <h1 class="text-2xl sm:text-3xl mt-0.5">مشتریان</h1>
+        </div>
+        <a href="{% url 'customers:add' %}" class="btn-primary btn-lg">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            مشتری
+        </a>
+    </div>
+
+    {# جست‌وجو — فیلد uiverse + دکمه‌ی متنیِ واضح #}
+    <form method="get" class="reveal mb-3 flex items-center gap-2">
+        <label class="search-field flex-1">
+            <button type="submit" aria-label="جست‌وجو">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+            <input type="search" name="q" value="{{ q }}" placeholder="جست‌وجوی نام یا شماره…" />
+        </label>
+        <button type="submit" class="btn-primary shrink-0">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            جست‌وجو
+        </button>
+    </form>
+
+    {% if q %}
+    <div class="reveal mb-4 flex items-center gap-2 text-sm text-ink-muted">
+        <span>نتایج برای «<span class="font-bold text-ink">{{ q }}</span>»</span>
+        <a href="{% url 'customers:list' %}" class="inline-flex items-center gap-1 font-bold text-brand-600 hover:text-brand-700">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            پاک کردن
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="stagger space-y-2">
+        {% for customer in customers %}
+        <a href="{% url 'customers:detail' pk=customer.pk %}"
+           class="card card-pad card-interactive flex items-center gap-3">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 font-black">
+                {{ customer.full_name|first }}
+            </span>
+            <div class="min-w-0 flex-1">
+                <h3 class="text-base truncate">{{ customer.full_name }}</h3>
+                <p class="text-xs text-ink-muted num" dir="ltr">{{ customer.phone|fa }}</p>
+            </div>
+            <span class="{{ customer.status_meta.badge }} shrink-0">{{ customer.status_meta.label }}</span>
+        </a>
+        {% empty %}
+        <div class="card card-pad text-center py-12">
+            <span class="grid h-16 w-16 mx-auto place-items-center rounded-2xl bg-surface-muted text-ink-muted mb-4">
+                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+            </span>
+            {% if q %}
+            <h3 class="text-lg">مشتری‌ای پیدا نشد</h3>
+            <p class="mt-1 text-ink-muted">برای «{{ q }}» نتیجه‌ای نبود.</p>
+            {% else %}
+            <h3 class="text-lg">هنوز مشتری‌ای ثبت نشده</h3>
+            <a href="{% url 'customers:add' %}" class="btn-primary mt-4">افزودن اولین مشتری</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

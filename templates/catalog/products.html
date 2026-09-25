@@ -1,0 +1,51 @@
+{% extends "dash_base.html" %}
+
+{% block title %}محصولات{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-6xl space-y-8">
+
+    {# سربرگ #}
+    <div class="reveal">
+        <h1 class="text-2xl sm:text-3xl">محصولات خدمات خودرو</h1>
+        <p class="mt-1 text-ink-soft font-medium">
+            محصولات فعالِ حساب شما و خدماتی که به‌زودی اضافه می‌شوند.
+        </p>
+    </div>
+
+    {# محصولات فعال #}
+    <div>
+        <h2 class="text-lg mb-3 flex items-center gap-2">
+            <span class="dot bg-growth-500"></span>
+            فعال روی حساب شما
+        </h2>
+        <p class="mb-4 text-sm text-ink-soft font-medium">
+            تعویض روغن: ۷ روز اول رایگان، بعد اشتراک ماهانه فقط ۴۹٬۰۰۰ تومان.
+        </p>
+        <div class="stagger grid sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center">
+            {% for p in available %}
+            {% url 'orders:create' product_id=p.pk as order_url %}
+            {% include "partials/product_pack_card.html" with product=p cta_url=order_url cta_label="خرید محصول" %}
+            {% empty %}
+            <div class="card card-pad text-ink-muted">محصول فعالی وجود ندارد.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# به‌زودی #}
+    {% if coming_soon %}
+    <div>
+        <h2 class="text-lg mb-3 flex items-center gap-2">
+            <span class="dot bg-slate-300"></span>
+            به‌زودی
+        </h2>
+        <div class="stagger grid sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center">
+            {% for p in coming_soon %}
+            {% include "partials/product_pack_card.html" with product=p %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
