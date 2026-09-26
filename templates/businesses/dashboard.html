@@ -1,195 +1,190 @@
 {% extends "dash_base.html" %}
 {% load jalali_tags %}
 
-{% block title %}داشبورد{% endblock %}
+{% block title %}خانه — {{ business.name }}{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-6xl space-y-6 sm:space-y-8">
+<div class="mx-auto max-w-5xl space-y-6">
 
-    {# ===== سربرگ ===== #}
-    <div class="reveal flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <p class="text-sm text-ink-muted">خوش اومدی</p>
-            <h1 class="text-2xl sm:text-3xl mt-0.5">{{ business.name }}</h1>
-        </div>
-        <a href="{% url 'customers:add' %}" class="btn-primary btn-lg self-start sm:self-auto">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            افزودن مشتری
+  {# ===== سلام + کار اصلی ===== #}
+  <section class="reveal cy-hello">
+    <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <p class="flex items-center gap-1.5 text-sm font-bold text-ink-muted">
+          {% include "partials/cy_icon.html" with name="calendar" cls="h-4 w-4" %}
+          {{ today|jalali_full }}
+        </p>
+        <h1 class="mt-1 text-2xl font-black sm:text-3xl">سلام {{ user.first_name|default:user.username }} 👋</h1>
+        <p class="mt-1 text-sm font-bold text-ink-soft">
+          {% if stats.today %}امروز <span class="num">{{ stats.today|fa }}</span> تعویض روغن ثبت کردی. دمت گرم!
+          {% else %}ماشین آمد؟ دکمه‌ی نارنجی را بزن.{% endif %}
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
+        <a href="{% url 'businesses:quick' %}" class="btn-accent btn-lg !rounded-2xl !px-3 whitespace-nowrap shadow-pop">
+          {% include "partials/cy_icon.html" with name="drop-plus" cls="h-6 w-6" %}
+          تعویض روغن
         </a>
+        <a href="{% url 'customers:add' %}" class="btn-outline btn-lg !rounded-2xl !px-3 whitespace-nowrap">
+          {% include "partials/cy_icon.html" with name="user-plus" cls="h-6 w-6" %}
+          مشتری جدید
+        </a>
+      </div>
     </div>
+  </section>
 
-    {# ===== محصولات فعال ===== #}
-    {% if nav_products %}
-    <div class="reveal flex flex-wrap items-center gap-2">
-        <span class="text-sm font-bold text-ink-muted">محصولات فعال:</span>
-        {% for p in nav_products %}
-        <span class="pill !bg-brand-50 !text-brand-700">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ p.icon_svg|safe }}</svg>
-            {{ p.title }}
-        </span>
-        {% endfor %}
-        <a href="{% url 'catalog:products' %}" class="pill hover:bg-surface-muted">
-            همه‌ی محصولات
-            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  {# ===== چراغ راهنمایی: وضعیت ماشین‌ها ===== #}
+  <section class="reveal" aria-labelledby="lights-title">
+    <h2 id="lights-title" class="mb-2 flex items-center gap-2 text-base font-black text-ink-soft">
+      {% include "partials/cy_icon.html" with name="car" cls="h-5 w-5" %}
+      ماشین‌های مشتری‌ها
+    </h2>
+    <div class="cy-light">
+      <a href="{% url 'businesses:reminders' %}#late" class="cy-lamp cy-lamp-red {% if stats.overdue %}cy-lamp-on{% else %}cy-lamp-off{% endif %}">
+        {% include "partials/cy_icon.html" with name="alert" %}
+        <span class="cy-lamp-num num">{{ stats.overdue|fa }}</span>
+        <span class="cy-lamp-label">دیر شده</span>
+        <span class="cy-lamp-hint">زودتر زنگ بزن</span>
+      </a>
+      <a href="{% url 'businesses:reminders' %}#soon" class="cy-lamp cy-lamp-yellow {% if stats.due_soon %}cy-lamp-on{% else %}cy-lamp-off{% endif %}">
+        {% include "partials/cy_icon.html" with name="clock" %}
+        <span class="cy-lamp-num num">{{ stats.due_soon|fa }}</span>
+        <span class="cy-lamp-label">نزدیکه</span>
+        <span class="cy-lamp-hint">تا ۲ هفته دیگر</span>
+      </a>
+      <a href="{% url 'customers:list' %}" class="cy-lamp cy-lamp-green {% if stats.ok %}cy-lamp-on{% else %}cy-lamp-off{% endif %}">
+        {% include "partials/cy_icon.html" with name="smile" %}
+        <span class="cy-lamp-num num">{{ stats.ok|fa }}</span>
+        <span class="cy-lamp-label">مرتبه</span>
+        <span class="cy-lamp-hint">کاری لازم نیست</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="grid gap-6 lg:grid-cols-5">
+
+    {# ===== امروز به این‌ها زنگ بزن ===== #}
+    <section class="reveal lg:col-span-3" aria-labelledby="call-title">
+      <div class="mb-2 flex items-center justify-between gap-2">
+        <h2 id="call-title" class="flex items-center gap-2 text-base font-black text-ink-soft">
+          {% include "partials/cy_icon.html" with name="phone" cls="h-5 w-5" %}
+          امروز به این‌ها زنگ بزن
+        </h2>
+        {% if attention %}
+        <a href="{% url 'businesses:reminders' %}" class="text-sm font-extrabold text-brand-600">
+          همه{% if attention_more %} (<span class="num">{{ attention_more|fa }}</span> نفر دیگر){% endif %}
         </a>
+        {% endif %}
+      </div>
+
+      {% if attention %}
+      <div class="stagger space-y-2.5">
+        {% for item in attention %}
+          {% include "businesses/_person_row.html" with item=item %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card card-pad flex items-center gap-3">
+        <span class="cy-tile-icon cy-tone-green shrink-0">{% include "partials/cy_icon.html" with name="check" sw="2.6" %}</span>
+        <div>
+          <p class="font-black">فعلاً کسی منتظر نیست</p>
+          <p class="text-sm font-bold text-ink-muted">هر وقت موعد ماشینی نزدیک شود، اینجا نشانت می‌دهیم.</p>
+        </div>
+      </div>
+      {% endif %}
+    </section>
+
+    {# ===== کارهای دیگر + آمار کوچک ===== #}
+    <section class="reveal space-y-4 lg:col-span-2" aria-label="کارهای دیگر">
+      <div class="grid grid-cols-3 gap-2.5 lg:grid-cols-2">
+        <a href="{% url 'customers:list' %}" class="cy-tile cy-tone-green">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="users" %}</span>
+          مشتری‌ها
+          <span class="cy-tile-sub num">{{ stats.customers|fa }} نفر</span>
+        </a>
+        <a href="{% url 'businesses:reminders' %}" class="cy-tile cy-tone-red">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="bell" %}</span>
+          یادآوری
+          <span class="cy-tile-sub num">{{ stats.overdue|add:stats.due_soon|fa }} ماشین</span>
+        </a>
+        <a href="{% url 'orders:list' %}" class="cy-tile cy-tone-violet">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="bag" %}</span>
+          سفارش‌ها
+        </a>
+        <a href="{% url 'catalog:products' %}" class="cy-tile cy-tone-orange lg:hidden">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="box" %}</span>
+          محصولات
+        </a>
+        <a href="{% url 'garage:settings' %}" class="cy-tile cy-tone-slate lg:hidden">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="wrench" %}</span>
+          ماشین و روغن
+        </a>
+        <a href="{% url 'accounts:profile' %}" class="cy-tile cy-tone-blue lg:hidden">
+          <span class="cy-tile-icon">{% include "partials/cy_icon.html" with name="user" %}</span>
+          حساب من
+        </a>
+      </div>
+
+      <div class="card card-pad">
+        <p class="mb-3 flex items-center gap-2 text-sm font-black text-ink-soft">
+          {% include "partials/cy_icon.html" with name="chart" cls="h-5 w-5" %}
+          کارِ تو در یک نگاه
+        </p>
+        <dl class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-2xl bg-orange-50 px-2 py-3">
+            <dt class="text-xs font-bold text-ink-muted">امروز</dt>
+            <dd class="num mt-0.5 text-2xl font-black text-orange-700">{{ stats.today|fa }}</dd>
+          </div>
+          <div class="rounded-2xl bg-brand-50 px-2 py-3">
+            <dt class="text-xs font-bold text-ink-muted">این ماه</dt>
+            <dd class="num mt-0.5 text-2xl font-black text-brand-700">{{ stats.this_month|fa }}</dd>
+          </div>
+          <div class="rounded-2xl bg-slate-50 px-2 py-3">
+            <dt class="text-xs font-bold text-ink-muted">همه</dt>
+            <dd class="num mt-0.5 text-2xl font-black text-ink">{{ stats.total_services|fa }}</dd>
+          </div>
+        </dl>
+        <p class="mt-2 text-center text-[11px] font-bold text-ink-muted">تعداد تعویض روغن</p>
+      </div>
+    </section>
+  </div>
+
+  {# ===== آخرین تعویض‌ها ===== #}
+  <section class="reveal" aria-labelledby="recent-title">
+    <h2 id="recent-title" class="mb-2 flex items-center gap-2 text-base font-black text-ink-soft">
+      {% include "partials/cy_icon.html" with name="history" cls="h-5 w-5" %}
+      آخرین تعویض‌ها
+    </h2>
+    {% if recent_services %}
+    <ol class="card divide-y divide-slate-100 overflow-hidden">
+      {% for s in recent_services %}
+      <li>
+        <a href="{% url 'customers:detail' pk=s.vehicle.customer.pk %}" class="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-soft">
+          <span class="cy-tile-icon cy-tone-orange !h-11 !w-11 !rounded-2xl shrink-0">{% include "partials/cy_icon.html" with name="oil" cls="!h-5 !w-5" %}</span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate font-black">{{ s.vehicle.customer.full_name }}</span>
+            <span class="block truncate text-xs font-bold text-ink-muted">
+              {{ s.vehicle.display_name|default:"خودرو" }}{% if s.oil_name %} · {{ s.oil_name }}{% endif %}
+            </span>
+          </span>
+          <span class="shrink-0 text-left">
+            <span class="block text-xs font-extrabold text-ink-soft">{{ s.service_date|jalali }}</span>
+            <span class="num block text-[11px] font-bold text-ink-muted">{{ s.mileage_km|fa }} کیلومتر</span>
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <div class="card card-pad text-center">
+      <span class="cy-tile-icon cy-tone-orange mx-auto">{% include "partials/cy_icon.html" with name="oil" %}</span>
+      <p class="mt-3 font-black">هنوز تعویض روغنی ثبت نشده</p>
+      <p class="mt-1 text-sm font-bold text-ink-muted">اولین ماشین را ثبت کن؛ فقط یک دقیقه طول می‌کشد.</p>
+      <a href="{% url 'businesses:quick' %}" class="btn-accent btn-lg mt-4 !rounded-2xl">
+        {% include "partials/cy_icon.html" with name="drop-plus" cls="h-6 w-6" %} ثبت اولین تعویض
+      </a>
     </div>
     {% endif %}
-
-    {# ===== کارت‌های آمار ===== #}
-    <div class="stagger grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="{% url 'customers:list' %}" class="card card-pad card-interactive">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-ink-muted">مشتریان</p>
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                </span>
-            </div>
-            <p class="mt-2 text-3xl font-black num">{{ stats.customers|fa }}</p>
-        </a>
-
-        <div class="card card-pad">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-ink-muted">خودروها</p>
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
-                </span>
-            </div>
-            <p class="mt-2 text-3xl font-black num">{{ stats.vehicles|fa }}</p>
-        </div>
-
-        <a href="{% url 'businesses:reminders' %}" class="card card-pad card-interactive">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-ink-muted">نزدیک موعد</p>
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-amber-50 text-warn">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </span>
-            </div>
-            <p class="mt-2 text-3xl font-black num text-warn">{{ stats.due_soon|fa }}</p>
-        </a>
-
-        <a href="{% url 'businesses:reminders' %}" class="card card-pad card-interactive">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-ink-muted">گذشته از موعد</p>
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-red-50 text-danger">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-                </span>
-            </div>
-            <p class="mt-2 text-3xl font-black num text-danger">{{ stats.overdue|fa }}</p>
-        </a>
-    </div>
-
-    <div class="stagger grid lg:grid-cols-2 gap-6">
-
-        {# ===== نیازمند توجه ===== #}
-        <div class="card">
-            <div class="card-pad flex items-center justify-between gap-4">
-                <h2 class="text-lg flex items-center gap-2">
-                    <svg class="h-5 w-5 text-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-                    نیازمند یادآوری
-                </h2>
-                {% if attention %}
-                <a href="{% url 'businesses:reminders' %}" class="text-sm font-bold text-brand-600 hover:text-brand-700">همه</a>
-                {% endif %}
-            </div>
-            {% if attention %}
-            <div class="border-t border-slate-100 divide-y divide-slate-100">
-                {% for vehicle in attention %}
-                <a href="{% url 'customers:detail' pk=vehicle.customer.pk %}" class="flex items-center gap-3 px-5 sm:px-6 py-3 hover:bg-surface-soft">
-                    <span class="dot {{ vehicle.status_meta.dot }} shrink-0"></span>
-                    <div class="min-w-0 flex-1">
-                        <p class="font-bold truncate">{{ vehicle.customer.full_name }}</p>
-                        <p class="text-xs text-ink-muted truncate">{{ vehicle.title }}</p>
-                    </div>
-                    <div class="text-left shrink-0">
-                        <p class="text-xs font-semibold {% if vehicle.status == 'overdue' %}text-danger{% else %}text-warn{% endif %}">
-                            {% with d=vehicle.days_until_due %}
-                            {% if d < 0 %}{{ d|absval|fa }} روز گذشته{% elif d == 0 %}امروز{% else %}{{ d|fa }} روز مانده{% endif %}
-                            {% endwith %}
-                        </p>
-                        <p class="text-xs text-ink-muted">{{ vehicle.next_due_date|jalali }}</p>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="border-t border-slate-100 px-6 py-12 text-center">
-                <span class="grid h-14 w-14 mx-auto place-items-center rounded-2xl bg-green-50 text-ok mb-3">
-                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </span>
-                <p class="font-bold">همه‌چیز مرتب است</p>
-                <p class="mt-1 text-sm text-ink-muted">فعلاً خودرویی نزدیک موعد نیست.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        {# ===== مشتریان اخیر ===== #}
-        <div class="card">
-            <div class="card-pad flex items-center justify-between gap-4">
-                <h2 class="text-lg">مشتریان اخیر</h2>
-                <a href="{% url 'customers:list' %}" class="text-sm font-bold text-brand-600 hover:text-brand-700">مشاهده همه</a>
-            </div>
-            {% if recent_customers %}
-            <div class="border-t border-slate-100 divide-y divide-slate-100">
-                {% for customer in recent_customers %}
-                <a href="{% url 'customers:detail' pk=customer.pk %}" class="flex items-center gap-3 px-5 sm:px-6 py-3 hover:bg-surface-soft">
-                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 font-black text-sm">
-                        {{ customer.full_name|first }}
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <p class="font-bold truncate">{{ customer.full_name }}</p>
-                        <p class="text-xs text-ink-muted num" dir="ltr">{{ customer.phone|fa }}</p>
-                    </div>
-                    <span class="{{ customer.status_meta.badge }} shrink-0">{{ customer.status_meta.label }}</span>
-                </a>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="border-t border-slate-100 px-6 py-12 text-center">
-                <span class="grid h-14 w-14 mx-auto place-items-center rounded-2xl bg-surface-muted text-ink-muted mb-3">
-                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-                </span>
-                <h3 class="text-base">هنوز مشتری‌ای ثبت نشده</h3>
-                <p class="mt-1 text-sm text-ink-muted max-w-xs mx-auto">اولین مشتری‌ات را ثبت کن تا موعد تعویض روغنش را برایت نگه داریم.</p>
-                <a href="{% url 'customers:add' %}" class="btn-primary mt-4">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                    افزودن اولین مشتری
-                </a>
-            </div>
-            {% endif %}
-        </div>
-
-    </div>
-
-    {# ===== آخرین فعالیت‌ها ===== #}
-    <div class="reveal card">
-        <div class="card-pad flex items-center justify-between gap-4">
-            <h2 class="text-lg flex items-center gap-2">
-                <svg class="h-5 w-5 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-                آخرین فعالیت‌ها
-            </h2>
-            <span class="badge-neutral">این ماه: <span class="num">{{ stats.this_month|fa }}</span> تعویض</span>
-        </div>
-        {% if recent_services %}
-        <div class="border-t border-slate-100 divide-y divide-slate-100">
-            {% for s in recent_services %}
-            <a href="{% url 'vehicles:detail' pk=s.vehicle.pk %}" class="flex items-center gap-3 px-5 sm:px-6 py-3 hover:bg-surface-soft">
-                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>
-                </span>
-                <div class="min-w-0 flex-1">
-                    <p class="font-bold truncate">{{ s.vehicle.customer.full_name }} — {{ s.vehicle.title }}</p>
-                    <p class="text-xs text-ink-muted num">{{ s.mileage_km|fa }} کیلومتر{% if s.oil_name %} · {{ s.oil_name }}{% endif %}</p>
-                </div>
-                <p class="text-xs text-ink-muted shrink-0">{{ s.service_date|jalali }}</p>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="border-t border-slate-100 px-6 py-10 text-center text-sm text-ink-muted">
-            هنوز تعویض روغنی ثبت نشده است.
-        </div>
-        {% endif %}
-    </div>
-
+  </section>
 </div>
 {% endblock %}

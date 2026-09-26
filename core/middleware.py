@@ -1,7 +1,7 @@
 """
 میان‌افزار چند-مستأجری (multitenancy) بر پایه‌ی میزبان (Host).
 
-روی میزبان‌های پلتفرم (localhost, servisa.ir, ...) رفتار عادی است:
+روی میزبان‌های پلتفرم (localhost, charkhyar.ir, ...) رفتار عادی است:
     request.business = None
     request.is_tenant = False
 
@@ -63,7 +63,7 @@ class TenantMiddleware:
 
     def _extract_subdomain(self, host):
         """برچسبِ سمت‌چپ را به‌عنوان ساب‌دامین برگردان (فقط یک سطح)."""
-        # <sub>.servisa.ir
+        # <sub>.charkhyar.ir
         suffix = "." + self.base_domain
         if host.endswith(suffix):
             label = host[: -len(suffix)]

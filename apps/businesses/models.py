@@ -15,7 +15,7 @@ class Business(models.Model):
         verbose_name="نام کسب‌وکار",
     )
 
-    # نشانی اختصاصی روی سرویسا: <subdomain>.servisa.ir
+    # نشانی اختصاصی روی چرخیار: <subdomain>.charkhyar.ir
     subdomain = models.SlugField(
         max_length=32,
         unique=True,
@@ -23,7 +23,7 @@ class Business(models.Model):
         blank=True,
         validators=[subdomain_validator],
         verbose_name="ساب‌دامین",
-        help_text="نشانی سایت شما: نام‌شما.servisa.ir",
+        help_text="نشانی سایت شما: نام‌شما.charkhyar.ir",
     )
 
     # دامنه‌ی اختصاصی کسب‌وکار (اختیاری، برای بعد): shop-domain.com
@@ -63,10 +63,27 @@ class Business(models.Model):
         help_text="برای دیده‌شدن در جست‌وجوی محلی گوگل، مثلاً: کرمان",
     )
 
+    # لوکیشن روی نقشه — مشتری با یک دکمه مسیر مغازه را پیدا می‌کند.
+    # فقط کسب‌وکاری که محصولی خریده می‌تواند ثبتش کند (has_purchase).
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name="عرض جغرافیایی",
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name="طول جغرافیایی",
+    )
+
     # اجازه‌ی نمایش در فهرست عمومیِ شهر (صاحب کسب‌وکار می‌تواند خاموش کند)
     is_listed = models.BooleanField(
         default=True,
-        verbose_name="نمایش در فهرست عمومی سرویسا",
+        verbose_name="نمایش در فهرست عمومی چرخیار",
         help_text="اگر خاموش باشد، در صفحه‌ی شهر نمایش داده نمی‌شود.",
     )
 
@@ -117,8 +134,37 @@ class Business(models.Model):
         return slugify(self.city, allow_unicode=True)
 
     @property
+    def has_location(self):
+        return self.latitude is not None and self.longitude is not None
+
+    @property
+    def has_purchase(self):
+        """آیا این کسب‌وکار محصولی سفارش داده (لغونشده)؟ شرطِ ثبت لوکیشن."""
+        return self.orders.exclude(status="cancelled").exists()
+
+    @property
+    def latlng(self):
+        """«lat,lng» با نقطه‌ی انگلیسی برای لینک‌های نقشه."""
+        if not self.has_location:
+            return ""
+        return f"{float(self.latitude):.6f},{float(self.longitude):.6f}"
+
+    @property
+    def directions_urls(self):
+        """لینک مسیریابی در اپ‌های نقشه‌ی رایج در ایران (به ترتیب محبوبیت)."""
+        if not self.has_location:
+            return []
+        lat = f"{float(self.latitude):.6f}"
+        lng = f"{float(self.longitude):.6f}"
+        return [
+            {"key": "neshan", "label": "نشان", "url": f"https://neshan.org/maps/@{lat},{lng},17z,0p"},
+            {"key": "balad", "label": "بلد", "url": f"https://balad.ir/location?latitude={lat}&longitude={lng}&zoom=17"},
+            {"key": "google", "label": "گوگل‌مپ", "url": f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}"},
+        ]
+
+    @property
     def primary_host(self):
-        """میزبان اصلی این کسب‌وکار (دامنه‌ی اختصاصی یا ساب‌دامین سرویسا)."""
+        """میزبان اصلی این کسب‌وکار (دامنه‌ی اختصاصی یا ساب‌دامین چرخیار)."""
         if self.custom_domain:
             return self.custom_domain
         return f"{self.subdomain}.{settings.TENANT_BASE_DOMAIN}"

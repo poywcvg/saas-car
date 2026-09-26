@@ -1,24 +1,21 @@
 {% extends "base.html" %}
 {% load jalali_tags %}
 
-{# صفحه‌ی اصلی وبلاگ: هاب محتوای سئویی سرویسا. #}
+{# صفحه‌ی اصلی وبلاگ: هاب محتوای سئویی چرخیار. #}
 
-{% block title %}وبلاگ سرویسا — آموزش نگهداری خودرو و تعویض روغن{% endblock %}
+{% block title %}وبلاگ چرخیار — آموزش نگهداری خودرو و تعویض روغن{% endblock %}
 
-{% block meta_description %}آموزش‌های کاربردی نگهداری خودرو: زمان تعویض روغن موتور، انتخاب روغن مناسب، فیلترها و سرویس دوره‌ای — ساده و قابل‌اعتماد از تیم سرویسا.{% endblock %}
+{% block meta_description %}آموزش‌های کاربردی نگهداری خودرو: زمان تعویض روغن موتور، انتخاب روغن مناسب، فیلترها و سرویس دوره‌ای — ساده و قابل‌اعتماد از تیم چرخیار.{% endblock %}
 
 {% block canonical %}{{ canonical }}{% endblock %}
 
 {% block robots %}{% if robots_noindex %}noindex, follow{% else %}index, follow, max-image-preview:large{% endif %}{% endblock %}
 
-{% block og_title %}وبلاگ سرویسا — آموزش نگهداری خودرو{% endblock %}
+{% block og_title %}وبلاگ چرخیار — آموزش نگهداری خودرو{% endblock %}
 {% block og_description %}هرچه درباره‌ی تعویض روغن، فیلترها و سرویس دوره‌ای خودرو باید بدانید.{% endblock %}
 
 {% block jsonld %}{{ jsonld_crumbs }}{{ jsonld_blog }}{% endblock %}
 
-{% block head %}
-<link rel="alternate" type="application/rss+xml" title="وبلاگ سرویسا" href="{% url 'blog:feed' %}">
-{% endblock %}
 
 {% block content %}
 
@@ -30,12 +27,12 @@
 
     <div class="container-app py-12 sm:py-16">
         <nav class="mb-5 flex items-center gap-2 text-sm text-ink-muted font-medium" aria-label="مسیر راهنما">
-            <a href="/" class="hover:text-brand-600">سرویسا</a>
+            <a href="/" class="hover:text-brand-600">چرخیار</a>
             <span aria-hidden="true">/</span>
             <span class="text-ink" aria-current="page">وبلاگ</span>
         </nav>
 
-        <span class="badge-growth mb-4">وبلاگ سرویسا</span>
+        <span class="badge-growth mb-4">وبلاگ چرخیار</span>
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.25] tracking-tight max-w-3xl">
             هرچه درباره‌ی نگهداری خودرو
             <span class="text-gradient">باید بدانید</span>
@@ -79,10 +76,14 @@
 {# ===== مقاله‌ی ویژه ===== #}
 {% if featured %}
 <section class="container-app pt-4 pb-2">
-    <article class="reveal card card-interactive overflow-hidden grid md:grid-cols-2">
+    <article class="group reveal card card-interactive overflow-hidden grid md:grid-cols-2">
         <a href="{{ featured.get_absolute_url }}" class="block md:order-2" tabindex="-1" aria-hidden="true">
-            <div class="blog-cover h-56 md:h-full min-h-56 grid place-items-center">
-                {% if featured.category.icon_svg %}
+            <div class="blog-cover relative overflow-hidden h-60 md:h-full min-h-60 grid place-items-center">
+                {% if featured.cover_url %}
+                <img src="{{ featured.cover_url }}" alt="{{ featured.cover_alt_text }}" width="1200" height="675"
+                     decoding="async" fetchpriority="high"
+                     class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                {% elif featured.category.icon_svg %}
                 <svg class="h-24 w-24 text-white/90 drop-shadow-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ featured.category.icon_svg|safe }}</svg>
                 {% endif %}
             </div>

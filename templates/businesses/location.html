@@ -1,0 +1,197 @@
+{% extends "dash_base.html" %}
+{% load static %}
+
+{% block title %}لوکیشن مغازه{% endblock %}
+
+{% block head %}<script src="{% static 'js/pin-map.js' %}"></script>{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-2xl space-y-5">
+
+  <a href="{% if next_url %}{{ next_url }}{% else %}{% url 'garage:settings' %}#set-biz{% endif %}" class="cy-back">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" sw="2.6" %} <span>برگشت</span>
+  </a>
+
+  {# ===== سربرگ ===== #}
+  <section class="reveal cy-hello">
+    <div class="relative flex items-center gap-3">
+      <span class="cy-tile-icon cy-tone-red !h-16 !w-16 shrink-0 !rounded-3xl">{% include "partials/cy_icon.html" with name="pin" cls="h-8 w-8" %}</span>
+      <div class="min-w-0 flex-1">
+        <h1 class="text-2xl font-black">مغازه‌ات کجاست؟</h1>
+        <p class="mt-0.5 text-sm font-bold text-ink-muted">یک بار ثبت کن؛ مشتری‌ها با یک دکمه تا دمِ مغازه مسیریابی می‌کنند.</p>
+      </div>
+    </div>
+    <div class="relative mt-4 flex items-center gap-2 rounded-2xl bg-white/80 p-3 ring-1 ring-slate-200">
+      {% if business.has_location %}
+      <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-green-100 text-green-700">{% include "partials/cy_icon.html" with name="check" cls="h-5 w-5" sw="2.8" %}</span>
+      <p class="font-black text-green-800">لوکیشن «{{ business.name }}» ثبت شده</p>
+      {% else %}
+      <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-700">{% include "partials/cy_icon.html" with name="clock" cls="h-5 w-5" %}</span>
+      <p class="font-black text-amber-800">لوکیشن «{{ business.name }}» هنوز ثبت نشده</p>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if not purchased %}
+  {# ===== قفل: فقط برای خریداران محصول ===== #}
+  <section class="reveal card card-pad text-center">
+    <span class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-violet-100 text-violet-700">{% include "partials/cy_icon.html" with name="bag" cls="h-8 w-8" %}</span>
+    <p class="mt-3 text-lg font-black">ثبت لوکیشن بعد از خرید محصول باز می‌شود</p>
+    <p class="mt-1 text-sm font-bold text-ink-muted">اول یکی از محصولات را برای مغازه‌ات سفارش بده.</p>
+    <a href="{% url 'catalog:products' %}" class="btn-primary btn-lg mt-5 !rounded-2xl">
+      {% include "partials/cy_icon.html" with name="bag" cls="h-5 w-5" %} دیدن محصولات
+    </a>
+  </section>
+
+  {% elif not allowed %}
+  <section class="reveal card card-pad flex items-center gap-3">
+    <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-slate-100 text-ink-soft">{% include "partials/cy_icon.html" with name="team" cls="h-6 w-6" %}</span>
+    <p class="font-bold">لوکیشن را صاحب یا مدیر مغازه ثبت می‌کند. اگر جایش اشتباه است به او بگو.</p>
+  </section>
+  {% if business.has_location %}{% include "partials/shop_location.html" with b=business compact=True noscript=True %}{% endif %}
+
+  {% else %}
+  {# ===== انتخاب روی نقشه ===== #}
+  <form method="post" class="space-y-4"
+        x-data="locPicker({ lat: {{ start.0|stringformat:'f' }}, lng: {{ start.1|stringformat:'f' }}, zoom: {{ start.2 }}, saved: {{ business.has_location|yesno:'true,false' }} })">
+    {% csrf_token %}
+    <input type="hidden" name="b" value="{{ business.pk }}">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <input type="hidden" name="lat" :value="lat">
+    <input type="hidden" name="lng" :value="lng">
+
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">۱</span>
+        <div>
+          <p class="cy-step-title">توی مغازه‌ای؟ یک دکمه بزن</p>
+          <p class="text-xs font-bold text-ink-muted">گوشی خودش جای تو را پیدا می‌کند.</p>
+        </div>
+      </div>
+
+      <button type="button" @click="locate()" :disabled="locating"
+              class="flex w-full items-center justify-center gap-3 rounded-2xl bg-green-600 px-4 py-4 text-lg font-black text-white shadow-pop transition hover:bg-green-700 active:scale-[.98] disabled:opacity-70">
+        <span :class="locating && 'animate-spin'" class="grid place-items-center">{% include "partials/cy_icon.html" with name="locate" cls="h-7 w-7" sw="2.4" %}</span>
+        <span x-text="locating ? 'در حال پیدا کردن…' : 'همین‌جا هستم، پیدا کن'">همین‌جا هستم، پیدا کن</span>
+      </button>
+
+      <div class="cy-step !mb-1 !mt-5">
+        <span class="cy-step-num">۲</span>
+        <div>
+          <p class="cy-step-title">سوزن را روی درِ مغازه بگذار</p>
+          <p class="text-xs font-bold text-ink-muted">نقشه را با انگشت بکش. سوزن سر جایش می‌ماند.</p>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-3xl ring-1 ring-slate-200" :class="dragging && 'pm-lift'">
+        <div x-ref="map" class="pm-map h-[22rem] sm:h-[26rem]" role="application" aria-label="نقشه؛ با کشیدن جابه‌جا کن"></div>
+        <svg class="pm-pin" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 46s16-14.2 16-26A16 16 0 0 0 8 20c0 11.8 16 26 16 26z" fill="#dc2626"/>
+          <circle cx="24" cy="20" r="6.5" fill="#fff"/>
+        </svg>
+        <span class="pm-shadow" aria-hidden="true"></span>
+        <p class="pm-hint" x-show="!touched" x-transition.opacity>نقشه را بکش ☝️</p>
+        <div class="absolute bottom-4 right-3 z-[3] flex flex-col gap-2">
+          <button type="button" class="pm-zoom" @click="map.zoomBy(1)" aria-label="بزرگ‌تر">{% include "partials/cy_icon.html" with name="plus" cls="h-6 w-6" sw="2.6" %}</button>
+          <button type="button" class="pm-zoom" @click="map.zoomBy(-1)" aria-label="کوچک‌تر"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        </div>
+      </div>
+
+      <p x-show="msg" x-cloak x-text="msg" aria-live="polite"
+         class="rounded-2xl p-3 text-sm font-bold"
+         :class="tone === 'bad' ? 'bg-red-50 text-red-800 ring-1 ring-red-200' : (tone === 'ok' ? 'bg-green-50 text-green-800 ring-1 ring-green-200' : 'bg-amber-50 text-amber-900 ring-1 ring-amber-200')"></p>
+
+      {# راه سوم: لینک نقشه (برای کسی که لوکیشن را در نشان/بلد/گوگل دارد) #}
+      <details class="rounded-2xl bg-surface-soft p-3">
+        <summary class="flex min-h-[2.75rem] cursor-pointer list-none items-center gap-2 text-sm font-black text-ink-soft">
+          {% include "partials/cy_icon.html" with name="link" cls="h-5 w-5" %} لینک نقشه داری؟ (نشان، بلد، گوگل‌مپ)
+        </summary>
+        <div class="mt-2 flex gap-2">
+          <input type="text" x-model="link" @keydown.enter.prevent="applyLink()" dir="ltr"
+                 class="input min-w-0 flex-1" placeholder="https://…" aria-label="لینک نقشه">
+          <button type="button" @click="applyLink()" class="btn-outline shrink-0 !rounded-xl">برو</button>
+        </div>
+      </details>
+    </section>
+
+    <div class="sticky bottom-[5.5rem] z-10 lg:bottom-4">
+      <button type="submit" class="btn-primary btn-lg btn-block !rounded-2xl !py-4 text-lg shadow-pop">
+        {% include "partials/cy_icon.html" with name="check" cls="h-6 w-6" sw="2.8" %} همین‌جاست، ذخیره کن
+      </button>
+    </div>
+  </form>
+
+  {% if business.has_location %}
+  <section class="space-y-3">
+    <h2 class="flex items-center gap-2 text-lg font-black">
+      {% include "partials/cy_icon.html" with name="smile" cls="h-5 w-5 text-ink-muted" %} مشتری‌ها این را می‌بینند
+    </h2>
+    {% include "partials/shop_location.html" with b=business compact=True noscript=True %}
+    <form method="post" onsubmit="return confirm('لوکیشن مغازه پاک شود؟')" class="text-center">
+      {% csrf_token %}
+      <input type="hidden" name="b" value="{{ business.pk }}">
+      <input type="hidden" name="action" value="clear">
+      <button type="submit" class="inline-flex min-h-[2.75rem] items-center gap-2 rounded-xl px-3 text-sm font-black text-red-700 hover:bg-red-50">
+        {% include "partials/cy_icon.html" with name="trash" cls="h-4 w-4" %} پاک کردن لوکیشن
+      </button>
+    </form>
+  </section>
+  {% endif %}
+
+  <script>
+    document.addEventListener("alpine:init", function () {
+      Alpine.data("locPicker", function (start) {
+        return {
+          lat: start.lat, lng: start.lng,
+          map: null, dragging: false, touched: start.saved,
+          locating: false, msg: "", tone: "", link: "",
+          init: function () {
+            var self = this;
+            this.map = PinMap.create(this.$refs.map, {
+              lat: start.lat, lng: start.lng, zoom: start.zoom,
+              onStart: function () { self.dragging = true; self.touched = true; },
+              onMove: function (p) { self.dragging = false; self.lat = p.lat; self.lng = p.lng; },
+            });
+          },
+          say: function (text, tone) { this.msg = text; this.tone = tone || ""; },
+          locate: function () {
+            var self = this;
+            if (!navigator.geolocation || !window.isSecureContext) {
+              this.say("این گوشی جا را پیدا نمی‌کند. نقشه را با انگشت بکش تا سوزن روی مغازه بیفتد.", "warn");
+              return;
+            }
+            this.locating = true;
+            this.say("");
+            navigator.geolocation.getCurrentPosition(function (pos) {
+              self.locating = false;
+              self.touched = true;
+              self.map.setView(pos.coords.latitude, pos.coords.longitude, 18);
+              if (pos.coords.accuracy > 120) {
+                self.say("جای تقریبی پیدا شد. اگر سوزن دقیقاً روی مغازه نیست، نقشه را کمی بکش.", "warn");
+              } else {
+                self.say("پیدا شد! اگر درست است، دکمه‌ی «ذخیره» پایین را بزن.", "ok");
+              }
+            }, function (err) {
+              self.locating = false;
+              self.say(err.code === 1
+                ? "اجازه‌ی مکان داده نشد. اشکالی ندارد؛ نقشه را با انگشت بکش."
+                : "جای تو پیدا نشد. نقشه را با انگشت بکش تا سوزن روی مغازه بیفتد.", "warn");
+            }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+          },
+          applyLink: function () {
+            var p = PinMap.parseLink(this.link);
+            if (!p) {
+              this.say("از این لینک جایی پیدا نشد. لینک کامل را بگذار یا نقشه را بکش.", "bad");
+              return;
+            }
+            this.touched = true;
+            this.map.setView(p.lat, p.lng, 18);
+            this.say("جا از روی لینک پیدا شد. اگر درست است، ذخیره کن.", "ok");
+          },
+        };
+      });
+    });
+  </script>
+  {% endif %}
+</div>
+{% endblock %}

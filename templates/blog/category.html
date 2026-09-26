@@ -3,14 +3,14 @@
 
 {# صفحه‌ی دسته‌بندی وبلاگ: هاب موضوعی برای سئو (مثل «روغن موتور»). #}
 
-{% block title %}{{ category.title }} — وبلاگ سرویسا{% endblock %}
+{% block title %}{{ category.title }} — وبلاگ چرخیار{% endblock %}
 
-{% block meta_description %}{% if category.description %}{{ category.description }}{% else %}همه‌ی مقالات {{ category.title }}: آموزش‌های کاربردی نگهداری خودرو از وبلاگ سرویسا.{% endif %}{% endblock %}
+{% block meta_description %}{% if category.description %}{{ category.description }}{% else %}همه‌ی مقالات {{ category.title }}: آموزش‌های کاربردی نگهداری خودرو از وبلاگ چرخیار.{% endif %}{% endblock %}
 
 {% block canonical %}{{ canonical }}{% endblock %}
 
-{% block og_title %}{{ category.title }} — وبلاگ سرویسا{% endblock %}
-{% block og_description %}{% if category.description %}{{ category.description }}{% else %}مقالات آموزشی {{ category.title }} در وبلاگ سرویسا.{% endif %}{% endblock %}
+{% block og_title %}{{ category.title }} — وبلاگ چرخیار{% endblock %}
+{% block og_description %}{% if category.description %}{{ category.description }}{% else %}مقالات آموزشی {{ category.title }} در وبلاگ چرخیار.{% endif %}{% endblock %}
 
 {% block jsonld %}{{ jsonld_crumbs }}{{ jsonld_blog }}{% endblock %}
 
@@ -23,7 +23,7 @@
 
     <div class="container-app py-12 sm:py-16">
         <nav class="mb-5 flex items-center gap-2 text-sm text-ink-muted font-medium" aria-label="مسیر راهنما">
-            <a href="/" class="hover:text-brand-600">سرویسا</a>
+            <a href="/" class="hover:text-brand-600">چرخیار</a>
             <span aria-hidden="true">/</span>
             <a href="{% url 'blog:index' %}" class="hover:text-brand-600">وبلاگ</a>
             <span aria-hidden="true">/</span>

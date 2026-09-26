@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from apps.businesses.models import Membership
@@ -18,6 +19,16 @@ from .forms import LoginForm, MemberEditForm, MemberRoleForm, OTPForm, ProfileFo
 from .models import OTP
 
 User = get_user_model()
+
+
+def _safe_next(request, default="businesses:dashboard"):
+    """مقصدِ ?next= فقط اگر داخل همین سایت باشد (جلوگیری از open redirect)."""
+    target = request.POST.get("next") or request.GET.get("next") or ""
+    if target and url_has_allowed_host_and_scheme(
+        target, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        return target
+    return default
 
 
 def _auth_context(login_form, register_form, active):
@@ -38,7 +49,7 @@ def login_view(request):
         if login_form.is_valid():
             login(request, login_form.get_user())
             messages.success(request, "خوش برگشتی")
-            return redirect(request.GET.get("next") or "businesses:dashboard")
+            return redirect(_safe_next(request))
         # خطا: همان کارت را با پنل ورود باز نگه دار
         return render(
             request,
@@ -282,7 +293,7 @@ def send_otp(request):
         return redirect("accounts:login")
 
     otp = OTP.generate(phone)
-    send_sms(phone, f"کد تایید سرویسا: {otp.code}\nاین کد تا ۵ دقیقه معتبر است.")
+    send_sms(phone, f"کد تایید چرخیار: {otp.code}\nاین کد تا ۵ دقیقه معتبر است.")
 
     request.session["otp_phone"] = phone
     request.session["otp_sent"] = True
@@ -323,7 +334,7 @@ def verify_otp(request):
                 if created:
                     messages.info(request, "حساب جدید ساخته شد. حالا پروفایل خود را تکمیل کنید.")
                     return redirect("accounts:profile")
-                return redirect(request.GET.get("next") or "businesses:dashboard")
+                return redirect(_safe_next(request))
             else:
                 messages.error(request, "کد تایید نادرست یا منقضی شده است.")
     else:
@@ -344,7 +355,7 @@ def resend_otp(request):
         return redirect("accounts:login")
 
     otp = OTP.generate(phone)
-    send_sms(phone, f"کد تایید سرویسا: {otp.code}\nاین کد تا ۵ دقیقه معتبر است.")
+    send_sms(phone, f"کد تایید چرخیار: {otp.code}\nاین کد تا ۵ دقیقه معتبر است.")
 
     messages.success(request, f"کد جدید به {phone} ارسال شد.")
     return redirect("accounts:verify_otp")

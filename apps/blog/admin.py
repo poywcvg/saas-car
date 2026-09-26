@@ -33,6 +33,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = ("reading_minutes", "views", "created_at", "updated_at")
     fieldsets = (
         ("مشخصات", {"fields": ("title", "slug", "excerpt", "category", "tags")}),
+        ("عکس کاور", {"fields": ("cover", "cover_alt", "cover_static")}),
         ("محتوا", {"fields": ("content", "faqs")}),
         (
             "سئو (خالی = خودکار)",

@@ -1,0 +1,137 @@
+{% extends "dash_base.html" %}
+{% load jalali_tags %}
+
+{% block title %}ثبت تعویض روغن{% endblock %}
+
+{% block app_content %}
+<div class="mx-auto max-w-2xl space-y-5">
+
+  <a href="{% url 'businesses:dashboard' %}" class="cy-back">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" sw="2.6" %} خانه
+  </a>
+
+  <header class="reveal">
+    <h1 class="flex items-center gap-2 text-2xl font-black sm:text-3xl">
+      <span class="cy-tile-icon cy-tone-orange !h-12 !w-12">{% include "partials/cy_icon.html" with name="drop-plus" %}</span>
+      ثبت تعویض روغن
+    </h1>
+    <p class="mt-2 text-base font-bold text-ink-soft">
+      <span class="cy-step-num !inline-grid !h-7 !w-7 !text-sm align-middle">۱</span>
+      شماره موبایل یا پلاک ماشین را بنویس.
+    </p>
+  </header>
+
+  <form method="get" action="{% url 'businesses:quick' %}" class="reveal cy-bigsearch" role="search">
+    <span class="grid h-11 w-11 shrink-0 place-items-center text-ink-muted">
+      {% include "partials/cy_icon.html" with name="search" cls="h-6 w-6" %}
+    </span>
+    <input type="search" name="q" value="{{ q }}" inputmode="search" enterkeyhint="search"
+           placeholder="مثلاً ۰۹۱۲… یا ۱۲ب۳۴۵"
+           aria-label="شماره موبایل، پلاک یا اسم مشتری"
+           {% if not q %}autofocus{% endif %} autocomplete="off">
+    <button type="submit" class="btn-primary btn-lg !rounded-2xl !px-5">پیدا کن</button>
+  </form>
+
+  {% if q %}
+    {# ===== نتیجه‌ها ===== #}
+    {% if vehicles or customers_without_vehicle %}
+    <p class="text-base font-bold text-ink-soft">
+      <span class="cy-step-num !inline-grid !h-7 !w-7 !text-sm align-middle">۲</span>
+      ماشین را پیدا کن و دکمه‌ی نارنجی را بزن.
+    </p>
+
+    <div class="stagger space-y-3">
+      {% for v in vehicles %}
+      <article class="card overflow-hidden">
+        <div class="flex items-center gap-3 p-4">
+          <span class="cy-avatar cy-tone-blue">{{ v.customer.full_name|first }}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-lg font-black">{{ v.customer.full_name }}</p>
+            <p class="num truncate text-sm font-bold text-ink-muted" dir="ltr" style="text-align:right">{{ v.customer.phone|fa }}</p>
+          </div>
+          {% include "partials/cy_due_chip.html" with v=v %}
+        </div>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 bg-surface-soft px-4 py-2.5 text-sm font-bold text-ink-soft">
+          <span class="inline-flex items-center gap-1.5">
+            {% include "partials/cy_icon.html" with name="car" cls="h-4 w-4 text-ink-muted" %}
+            {{ v.display_name|default:"خودرو" }}
+          </span>
+          {% if v.plate %}
+          {% include "partials/cy_plate.html" with p=v.plate %}
+          {% endif %}
+          {% if v.last_mileage_km %}
+          <span class="inline-flex items-center gap-1.5 text-ink-muted">
+            {% include "partials/cy_icon.html" with name="gauge" cls="h-4 w-4" %}
+            دفعه‌ی قبل: <span class="num">{{ v.last_mileage_km|fa }}</span> کیلومتر
+          </span>
+          {% endif %}
+        </div>
+        <div class="grid grid-cols-[1fr_auto] gap-2 p-3">
+          <a href="{% url 'oilchange:add' vehicle_pk=v.pk %}" class="btn-accent btn-lg !rounded-2xl">
+            {% include "partials/cy_icon.html" with name="drop-plus" cls="h-6 w-6" %}
+            ثبت تعویض روغن
+          </a>
+          <a href="{% url 'customers:detail' pk=v.customer.pk %}" class="btn-outline btn-lg !rounded-2xl" aria-label="پرونده‌ی {{ v.customer.full_name }}">
+            {% include "partials/cy_icon.html" with name="user" cls="h-5 w-5" %}
+            <span class="hidden sm:inline">پرونده</span>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+
+      {% for c in customers_without_vehicle %}
+      <article class="card flex items-center gap-3 p-4">
+        <span class="cy-avatar cy-tone-slate">{{ c.full_name|first }}</span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-lg font-black">{{ c.full_name }}</p>
+          <p class="text-sm font-bold text-ink-muted">هنوز ماشینی برایش ثبت نشده</p>
+        </div>
+        <a href="{% url 'vehicles:add' customer_pk=c.pk %}" class="btn-primary !rounded-2xl">
+          {% include "partials/cy_icon.html" with name="plus" cls="h-5 w-5" sw="2.6" %} ماشین
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+
+    <p class="pt-2 text-center text-sm font-bold text-ink-muted">
+      کسی که می‌خواستی نبود؟
+      <a href="{% url 'customers:add' %}{% if prefill_phone %}?phone={{ prefill_phone }}{% endif %}" class="text-brand-600 underline underline-offset-4">مشتری جدید بساز</a>
+    </p>
+
+    {% else %}
+    {# ===== پیدا نشد ===== #}
+    <div class="reveal card card-pad text-center">
+      <span class="cy-tile-icon cy-tone-sky mx-auto !h-16 !w-16">{% include "partials/cy_icon.html" with name="user-plus" cls="!h-8 !w-8" %}</span>
+      <p class="mt-3 text-lg font-black">کسی با «<span class="num">{{ q|fa }}</span>» پیدا نشد</p>
+      <p class="mt-1 text-sm font-bold text-ink-muted">احتمالاً مشتری تازه است. با یک دکمه ثبتش کن.</p>
+      <a href="{% url 'customers:add' %}{% if prefill_phone %}?phone={{ prefill_phone }}{% endif %}" class="btn-primary btn-lg btn-block mt-5 !rounded-2xl">
+        {% include "partials/cy_icon.html" with name="user-plus" cls="h-6 w-6" %}
+        ثبت مشتری جدید{% if prefill_phone %} با این شماره{% endif %}
+      </a>
+    </div>
+    {% endif %}
+
+  {% else %}
+    {# ===== راهنما (قبل از جست‌وجو) ===== #}
+    <ol class="reveal grid gap-3 sm:grid-cols-3">
+      <li class="card card-pad flex items-center gap-3 sm:flex-col sm:text-center">
+        <span class="cy-tile-icon cy-tone-blue shrink-0">{% include "partials/cy_icon.html" with name="search" %}</span>
+        <span><b class="block font-black">پیدا کن</b><span class="text-sm font-bold text-ink-muted">موبایل یا پلاک</span></span>
+      </li>
+      <li class="card card-pad flex items-center gap-3 sm:flex-col sm:text-center">
+        <span class="cy-tile-icon cy-tone-orange shrink-0">{% include "partials/cy_icon.html" with name="gauge" %}</span>
+        <span><b class="block font-black">کیلومتر را بزن</b><span class="text-sm font-bold text-ink-muted">عدد کیلومترشمار</span></span>
+      </li>
+      <li class="card card-pad flex items-center gap-3 sm:flex-col sm:text-center">
+        <span class="cy-tile-icon cy-tone-green shrink-0">{% include "partials/cy_icon.html" with name="bell" %}</span>
+        <span><b class="block font-black">تمام!</b><span class="text-sm font-bold text-ink-muted">موعد بعدی را یادت می‌اندازیم</span></span>
+      </li>
+    </ol>
+
+    <a href="{% url 'customers:add' %}" class="reveal btn-outline btn-lg btn-block !rounded-2xl">
+      {% include "partials/cy_icon.html" with name="user-plus" cls="h-6 w-6" %}
+      مشتری تازه است؟ اینجا ثبتش کن
+    </a>
+  {% endif %}
+</div>
+{% endblock %}

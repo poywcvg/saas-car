@@ -3,121 +3,102 @@
 {% block title %}پروفایل{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-2xl space-y-6">
+<div class="mx-auto max-w-2xl space-y-5">
 
-    <div class="reveal flex flex-wrap items-start justify-between gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl">پروفایل من</h1>
-            <p class="mt-1 text-ink-soft font-medium">اطلاعات حساب کاربری و کسب‌وکارهای شما.</p>
-        </div>
-
-        {# منوی دسترسی سریع (From Uiverse.io by gharsh11032000) #}
-        <div class="uv-menu">
-            <div class="uv-item">
-                <button type="button" class="uv-link" aria-haspopup="true" aria-label="منوی دسترسی سریع">
-                    <span>دسترسی سریع</span>
-                    <svg viewBox="0 0 360 360" xml:space="preserve" aria-hidden="true"><g><path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path></g></svg>
-                </button>
-                <div class="uv-submenu">
-                    <div class="uv-submenu-item">
-                        <a href="{% url 'businesses:dashboard' %}" class="uv-submenu-link">داشبورد</a>
-                    </div>
-                    {% if nav_role == 'owner' or nav_role == 'manager' %}
-                    <div class="uv-submenu-item">
-                        <a href="{% url 'accounts:team' %}" class="uv-submenu-link">اعضای تیم</a>
-                    </div>
-                    {% endif %}
-                    <div class="uv-submenu-item">
-                        <a href="{% url 'orders:list' %}" class="uv-submenu-link">سفارشات</a>
-                    </div>
-                    <div class="uv-submenu-item">
-                        <a href="{% url 'businesses:reminders' %}" class="uv-submenu-link">یادآوری‌ها</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+  {# ===== کارت من ===== #}
+  <section class="reveal cy-hello">
+    <div class="relative flex items-center gap-3">
+      <span class="cy-avatar cy-tone-blue !h-16 !w-16 !rounded-3xl !text-2xl">{{ user.get_full_name|default:user.username|first|upper }}</span>
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-2xl font-black">{{ user.get_full_name|default:user.username }}</h1>
+        <p class="truncate text-sm font-bold text-ink-muted" dir="ltr" style="text-align:right">@{{ user.username }}</p>
+      </div>
     </div>
 
-    {# اطلاعات کاربر #}
-    <div class="reveal card card-pad">
-        <div class="flex items-center gap-4 mb-6 pb-5 border-b border-slate-100">
-            <span class="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 font-black text-2xl">
-                {{ user.username|first|upper }}
-            </span>
-            <div>
-                <h2 class="text-lg font-bold">{{ user.get_full_name|default:user.username }}</h2>
-                <p class="text-sm text-ink-muted">@{{ user.username }}</p>
-            </div>
-        </div>
-
-        <form method="post" class="space-y-4">
-            {% csrf_token %}
-            <div class="grid sm:grid-cols-2 gap-4">
-                {% include 'partials/field.html' with field=form.first_name %}
-                {% include 'partials/field.html' with field=form.last_name %}
-            </div>
-            {% include 'partials/field.html' with field=form.phone %}
-            {% include 'partials/field.html' with field=form.email %}
-            <button type="submit" class="btn-primary">بروزرسانی پروفایل</button>
-        </form>
+    {# میان‌بُرها — دکمه‌های بزرگ با آیکون #}
+    <div class="relative mt-4 grid grid-cols-3 gap-2">
+      <a href="{% url 'businesses:dashboard' %}" class="cy-tile cy-tone-blue !min-h-[5.5rem] !gap-1.5 !py-3">
+        <span class="cy-tile-icon !h-11 !w-11">{% include "partials/cy_icon.html" with name="home" %}</span> خانه
+      </a>
+      {% if nav_role == 'owner' or nav_role == 'manager' %}
+      <a href="{% url 'accounts:team' %}" class="cy-tile cy-tone-green !min-h-[5.5rem] !gap-1.5 !py-3">
+        <span class="cy-tile-icon !h-11 !w-11">{% include "partials/cy_icon.html" with name="team" %}</span> تیم
+      </a>
+      {% else %}
+      <a href="{% url 'businesses:reminders' %}" class="cy-tile cy-tone-orange !min-h-[5.5rem] !gap-1.5 !py-3">
+        <span class="cy-tile-icon !h-11 !w-11">{% include "partials/cy_icon.html" with name="bell" %}</span> یادآوری
+      </a>
+      {% endif %}
+      <a href="{% url 'orders:list' %}" class="cy-tile cy-tone-violet !min-h-[5.5rem] !gap-1.5 !py-3">
+        <span class="cy-tile-icon !h-11 !w-11">{% include "partials/cy_icon.html" with name="bag" %}</span> سفارش‌ها
+      </a>
     </div>
+  </section>
 
-    {# کسب‌وکارها #}
-    <div class="reveal card card-pad">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-            <svg class="h-5 w-5 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
-            کسب‌وکارهای من
-        </h2>
-        {% if memberships %}
-        <div class="divide-y divide-slate-100">
-            {% for m in memberships %}
-            <div class="flex items-center gap-3 py-3">
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 font-black">
-                    {{ m.business.name|first }}
-                </span>
-                <div class="min-w-0 flex-1">
-                    <p class="font-bold truncate">{{ m.business.name }}</p>
-                    <p class="text-xs text-ink-muted">{{ m.get_role_display }} · {{ m.business.primary_host }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="text-sm text-ink-muted">هنوز کسب‌وکاری ثبت نکرده‌اید.</p>
-        {% endif %}
+  {# ===== فرم مشخصات ===== #}
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">{% include "partials/cy_icon.html" with name="user" cls="h-4 w-4" %}</span>
+        <div><p class="cy-step-title">مشخصات من</p></div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {% include 'partials/field.html' with field=form.first_name %}
+        {% include 'partials/field.html' with field=form.last_name %}
+      </div>
+      {% include 'partials/field.html' with field=form.phone %}
+      {% include 'partials/field.html' with field=form.email %}
+    </section>
+    <div>
+      <button type="submit" class="btn-primary btn-lg btn-block !rounded-2xl !py-4 text-lg shadow-pop">
+        {% include "partials/cy_icon.html" with name="check" cls="h-6 w-6" sw="2.8" %} ذخیره
+      </button>
     </div>
+  </form>
 
-    {# آخرین سفارشات #}
-    <div class="reveal card card-pad">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-            <svg class="h-5 w-5 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            آخرین سفارشات
-        </h2>
-        {% if orders %}
-        <div class="divide-y divide-slate-100">
-            {% for order in orders %}
-            <a href="{% url 'orders:detail' pk=order.pk %}" class="flex items-center gap-3 py-3 hover:bg-surface-soft -mx-2 px-2 rounded-xl transition">
-                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
-                </span>
-                <div class="min-w-0 flex-1">
-                    <p class="font-bold text-sm truncate">{{ order.product.title }}</p>
-                    <p class="text-xs text-ink-muted">{{ order.business.name }}</p>
-                </div>
-                <span class="{% if order.status == 'confirmed' %}badge-growth{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-neutral{% endif %} shrink-0">
-                    {{ order.get_status_display }}
-                </span>
-            </a>
-            {% endfor %}
-        </div>
-        <a href="{% url 'orders:list' %}" class="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">
-            مشاهده همه سفارشات
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </a>
-        {% else %}
-        <p class="text-sm text-ink-muted">هنوز سفارشی ثبت نکرده‌اید.</p>
-        {% endif %}
+  {# ===== مغازه‌ها ===== #}
+  <section class="space-y-3">
+    <h2 class="flex items-center gap-2 text-lg font-black">
+      {% include "partials/cy_icon.html" with name="home" cls="h-5 w-5 text-ink-muted" %} مغازه‌های من
+    </h2>
+    {% for m in memberships %}
+    <div class="cy-person" style="--row-tone: #2563eb">
+      <span class="cy-avatar cy-tone-blue">{{ m.business.name|first }}</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-base font-black">{{ m.business.name }}</span>
+        <span class="block truncate text-xs font-bold text-ink-muted" dir="ltr" style="text-align:right">{{ m.business.primary_host }}</span>
+      </span>
+      <span class="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-ink-soft">{{ m.get_role_display }}</span>
     </div>
+    {% empty %}
+    <p class="card card-pad text-sm font-bold text-ink-muted">هنوز مغازه‌ای نداری.</p>
+    {% endfor %}
+  </section>
 
+  {# ===== آخرین سفارش‌ها ===== #}
+  {% if orders %}
+  <section class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="flex items-center gap-2 text-lg font-black">
+        {% include "partials/cy_icon.html" with name="bag" cls="h-5 w-5 text-ink-muted" %} آخرین سفارش‌ها
+      </h2>
+      <a href="{% url 'orders:list' %}" class="btn-outline !rounded-2xl">همه {% include "partials/cy_icon.html" with name="next" cls="h-4 w-4" sw="2.6" %}</a>
+    </div>
+    {% for order in orders|slice:":3" %}
+    <a href="{% url 'orders:detail' pk=order.pk %}" class="cy-person"
+       style="--row-tone: {% if order.status == 'confirmed' %}#16a34a{% elif order.status == 'cancelled' %}#dc2626{% else %}#f59e0b{% endif %}">
+      <span class="cy-tile-icon {% if order.status == 'confirmed' %}cy-tone-green{% elif order.status == 'cancelled' %}cy-tone-red{% else %}cy-tone-orange{% endif %} !h-11 !w-11 shrink-0">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate font-black">{{ order.product.title }}</span>
+        <span class="block truncate text-xs font-bold text-ink-muted">{{ order.business.name }}</span>
+      </span>
+      <span class="cy-chip-due {% if order.status == 'confirmed' %}cy-due-green{% elif order.status == 'cancelled' %}cy-due-red{% else %}cy-due-yellow{% endif %}">{{ order.get_status_display }}</span>
+    </a>
+    {% endfor %}
+  </section>
+  {% endif %}
 </div>
 {% endblock %}

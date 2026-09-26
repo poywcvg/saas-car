@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{# صفحه‌ی خصوصی/کاربردی — نباید در نتایج گوگل بیاید #}
+{% block robots %}noindex, nofollow{% endblock %}
 
 {% block title %}تایید کد OTP{% endblock %}
 

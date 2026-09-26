@@ -1,0 +1,7 @@
+{% load jalali_tags %}{# برچسبِ رنگیِ وضعیت یک خودرو — استفاده: {% include "partials/cy_due_chip.html" with v=vehicle %} #}
+{% with d=v.days_until_due st=v.status %}
+{% if st == "overdue" %}<span class="cy-chip-due cy-due-red">{% include "partials/cy_icon.html" with name="alert" cls="h-3.5 w-3.5" sw="2.6" %}دیر شده{% if d is not None %} · <span class="num">{{ d|absval|fa }}</span> روز{% endif %}</span>
+{% elif st == "due_soon" %}<span class="cy-chip-due cy-due-yellow">{% include "partials/cy_icon.html" with name="clock" cls="h-3.5 w-3.5" sw="2.6" %}{% if d == 0 %}همین امروز{% else %}نزدیکه · <span class="num">{{ d|fa }}</span> روز مانده{% endif %}</span>
+{% elif st == "ok" %}<span class="cy-chip-due cy-due-green">{% include "partials/cy_icon.html" with name="check" cls="h-3.5 w-3.5" sw="2.8" %}مرتبه</span>
+{% else %}<span class="cy-chip-due bg-slate-100 text-slate-600">هنوز تعویض نشده</span>{% endif %}
+{% endwith %}

@@ -1,6 +1,7 @@
 from django import forms
 
 from core.forms import StyledFormMixin
+from core.normalize import normalize_phone
 
 from .models import Customer
 
@@ -28,7 +29,8 @@ class CustomerForm(StyledFormMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, business=None, **kwargs):
+        self.business = business
         super().__init__(*args, **kwargs)
         # فقط اسم و موبایل اجباری‌اند؛ بقیه اختیاری.
         self.fields["full_name"].required = True
@@ -36,11 +38,22 @@ class CustomerForm(StyledFormMixin, forms.ModelForm):
         self.fields["note"].required = False
 
     def clean_phone(self):
-        phone = (self.cleaned_data.get("phone") or "").strip()
-        # ارقام فارسی را به لاتین تبدیل کن تا ذخیره‌ی یکدست شود
-        translation = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
-        phone = phone.translate(translation)
-        digits = "".join(ch for ch in phone if ch.isdigit())
-        if len(digits) < 10:
-            raise forms.ValidationError("شماره موبایل معتبر نیست.")
-        return digits
+        # ارقام فارسی و پیشوند +98 را یکدست کن: همیشه 09xxxxxxxxx
+        phone = normalize_phone(self.cleaned_data.get("phone"))
+        if len(phone) != 11 or not phone.startswith("09"):
+            raise forms.ValidationError(
+                "شماره موبایل درست نیست. ۱۱ رقم و با ۰۹ شروع شود؛ مثل ۰۹۱۲۳۴۵۶۷۸۹"
+            )
+        # یک شماره فقط یک مشتری در هر کسب‌وکار (جلوگیری از پرونده‌ی تکراری)
+        if self.business is not None:
+            duplicate = (
+                self.business.customers.filter(phone=phone)
+                .exclude(pk=self.instance.pk)
+                .first()
+            )
+            if duplicate:
+                self.duplicate = duplicate
+                raise forms.ValidationError(
+                    f"این شماره قبلاً برای «{duplicate.full_name}» ثبت شده است."
+                )
+        return phone

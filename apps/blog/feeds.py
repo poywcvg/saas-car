@@ -6,7 +6,7 @@ from .models import Post
 
 
 class LatestPostsFeed(Feed):
-    title = "وبلاگ سرویسا — نگهداری خودرو و تعویض روغن"
+    title = "وبلاگ چرخیار — نگهداری خودرو و تعویض روغن"
     link = "/blog/"
     description = (
         "آموزش‌های کاربردی نگهداری خودرو، روغن موتور، فیلتر و سرویس دوره‌ای."

@@ -1,12 +1,9 @@
 """پردازنده‌های زمینه (context processors) مشترک برای همه‌ی صفحه‌ها."""
 
-import datetime
-
 from django.db.models import Q
 
 from apps.catalog.models import Product
-from apps.vehicles.models import Vehicle
-from core import service_status
+from apps.vehicles.selectors import due_vehicles
 from core.access import current_business, user_role_in
 
 
@@ -24,13 +21,8 @@ def nav_badges(request):
     if not business:
         return {}
 
-    today = datetime.date.today()
-    soon = today + datetime.timedelta(days=service_status.DUE_SOON_DAYS)
-    reminder_count = Vehicle.objects.filter(
-        customer__business=business,
-        next_due_date__isnull=False,
-        next_due_date__lte=soon,
-    ).count()
+    overdue, due_soon = due_vehicles(business)
+    reminder_count = len(overdue) + len(due_soon)
 
     return {
         "nav_business": business,

@@ -1,12 +1,48 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.catalog.models import Product
-from apps.vehicles.models import Vehicle
+from apps.vehicles.models import Vehicle, VehicleOption
 from core.access import current_business
+from core.jalali import MONTHS, format_jalali, to_jalali
 
 from .forms import OilChangeForm
+from .models import OilChange
+from django.utils import timezone
+
+
+def _oil_options(business, vehicle):
+    """نام روغن‌ها برای انتخاب با یک لمس: روغنِ قبلیِ همین ماشین + فهرستِ روغن‌های مغازه."""
+    names = []
+    last = vehicle.latest_oilchange
+    if last is not None and last.oil_name:
+        names.append(last.oil_name)
+    if vehicle.preferred_oil_id:
+        names.append(vehicle.preferred_oil.name)
+    names += VehicleOption.objects.filter(
+        business=business, kind=VehicleOption.Kind.OIL, is_active=True
+    ).values_list("name", flat=True)[:10]
+    return list(dict.fromkeys(n for n in names if n))[:10]
+
+
+def _date_picker_context():
+    """داده‌ی انتخابگرِ تاریخ شمسی: دکمه‌های امروز/دیروز/پریروز + روز/ماه/سال."""
+    today = timezone.localdate()
+    quick = []
+    for offset, label in ((0, "امروز"), (1, "دیروز"), (2, "پریروز")):
+        day = today - datetime.timedelta(days=offset)
+        quick.append({"iso": day.isoformat(), "label": label, "fa": format_jalali(day)})
+    jy, jm, jd = to_jalali(today)
+    return {
+        "date_quick": quick,
+        "jalali_today": {"y": jy, "m": jm, "d": jd},
+        "jalali_months": list(enumerate(MONTHS, start=1)),
+        "jalali_years": list(range(jy, jy - 4, -1)),
+        "jalali_days": list(range(1, 32)),
+    }
 
 
 @login_required
@@ -22,7 +58,7 @@ def oilchange_add(request, vehicle_pk):
     )
 
     if request.method == "POST":
-        form = OilChangeForm(request.POST)
+        form = OilChangeForm(request.POST, vehicle=vehicle)
         if form.is_valid():
             record = form.save(commit=False)
             record.vehicle = vehicle
@@ -53,7 +89,8 @@ def oilchange_add(request, vehicle_pk):
         estimated = vehicle.estimated_current_mileage
         if estimated is not None:
             initial["mileage_km"] = estimated
-        form = OilChangeForm(initial=initial)
+        initial["service_date"] = timezone.localdate().isoformat()
+        form = OilChangeForm(initial=initial, vehicle=vehicle)
 
     return render(
         request,
@@ -66,5 +103,8 @@ def oilchange_add(request, vehicle_pk):
             "estimated_mileage": vehicle.estimated_current_mileage,
             "daily_km": round(vehicle.daily_km),
             "last_mileage": vehicle.last_mileage_km,
+            "oil_options": _oil_options(business, vehicle),
+            "interval_month_choices": OilChange.INTERVAL_MONTHS_CHOICES,
+            **_date_picker_context(),
         },
     )

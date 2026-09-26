@@ -19,8 +19,13 @@ from django.conf.urls.static import static
 from django.urls import include, path
 
 from apps.customers import views as customers_views
+from apps.pages import seo_views
 
 urlpatterns = [
+    # سئو: هر ساب‌دامین میزبانِ جداگانه‌ای است و robots/sitemap خودش را می‌خواهد
+    path("robots.txt", seo_views.tenant_robots_txt, name="robots_txt"),
+    path("sitemap.xml", seo_views.tenant_sitemap_xml, name="sitemap_xml"),
+
     # سایت عمومیِ نماینده
     path("", include("apps.tenants.urls")),
 
@@ -31,6 +36,8 @@ urlpatterns = [
     path("customers/", include("apps.customers.urls")),
     path("vehicles/", include("apps.vehicles.urls")),
     path("oilchange/", include("apps.oilchange.urls")),
+    path("orders/", include("apps.orders.urls")),
+    path("garage/", include("apps.vehicles.settings_urls")),
 
     # لینک عمومی مشتری (پیامکی، بدون ورود)
     path("c/<uuid:token>/", customers_views.public_customer, name="public_customer"),

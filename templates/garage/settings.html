@@ -1,16 +1,23 @@
 {% extends "dash_base.html" %} {% block title %}تنظیمات خودرو{% endblock %} {%block app_content %}
 <div class="mx-auto max-w-3xl">
-  <div class="reveal mb-6">
-    <p class="text-sm text-ink-muted">{{ business.name }}</p>
-    <h1 class="text-2xl sm:text-3xl mt-0.5">تنظیمات خودرو</h1>
-    <p class="mt-1 text-ink-soft font-medium">
-      اطلاعات کسب‌وکارت و گزینه‌هایی که موقع ثبت خودرو انتخاب می‌شوند را اینجا
-      مدیریت کن.
-    </p>
-  </div>
+  <header class="reveal mb-4 flex items-center gap-3">
+    <span class="cy-tile-icon cy-tone-slate !h-14 !w-14 shrink-0">{% include "partials/cy_icon.html" with name="wrench" cls="!h-7 !w-7" %}</span>
+    <div class="min-w-0">
+      <h1 class="text-2xl font-black sm:text-3xl">تنظیمات</h1>
+      <p class="truncate text-sm font-bold text-ink-muted">{{ business.name }} — اطلاعات مغازه و گزینه‌های ثبت ماشین</p>
+    </div>
+  </header>
+
+  {# پرش سریع به هر بخش #}
+  <nav class="cy-jump sticky top-0 z-20 -mx-4 mb-5 px-4 py-2 lg:mx-0 lg:px-0" aria-label="بخش‌های تنظیمات">
+    <a href="#set-biz">{% include "partials/cy_icon.html" with name="home" cls="h-4 w-4" %} مغازه</a>
+    <a href="#set-brands">{% include "partials/cy_icon.html" with name="car" cls="h-4 w-4" %} برند و مدل</a>
+    {% for group in options_by_kind %}<a href="#set-opt-{{ forloop.counter }}">{{ group.label }}</a>{% endfor %}
+    <a href="#set-services">{% include "partials/cy_icon.html" with name="oil" cls="h-4 w-4" %} خدمات</a>
+  </nav>
 
   {# ==================== اطلاعات کسب‌وکار (دیده‌شدن در گوگل) ==================== #}
-  <section class="reveal card card-pad mb-5">
+  <section id="set-biz" class="reveal card card-pad mb-5 scroll-mt-20">
     <div class="flex items-center gap-2 mb-4">
       <span
         class="grid h-9 w-9 place-items-center rounded-xl bg-growth-50 text-growth-600"
@@ -86,16 +93,26 @@
         />
       </label>
 
+      {% url 'businesses:location' as loc_url %}
+      <a href="{{ loc_url }}?b={{ business.pk }}" class="flex min-h-[3.5rem] items-center gap-3 rounded-2xl p-3 ring-1 {% if business.has_location %}bg-green-50 ring-green-200{% else %}bg-surface-soft ring-slate-200{% endif %}">
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl {% if business.has_location %}bg-green-100 text-green-700{% else %}bg-white text-red-600{% endif %}">{% include "partials/cy_icon.html" with name="pin" cls="h-5 w-5" %}</span>
+        <span class="min-w-0 flex-1 text-sm">
+          <span class="block font-bold">لوکیشن روی نقشه</span>
+          <span class="block text-ink-muted">{% if business.has_location %}ثبت شده — مشتری‌ها دکمه‌ی مسیریابی می‌بینند{% elif business.has_purchase %}هنوز ثبت نشده — بزن تا ثبت کنی{% else %}بعد از خرید محصول باز می‌شود{% endif %}</span>
+        </span>
+        {% include "partials/cy_icon.html" with name="next" cls="h-5 w-5 shrink-0 text-ink-muted" sw="2.6" %}
+      </a>
+
       <label class="flex items-start gap-3 rounded-2xl bg-surface-soft p-3">
         <input
           type="checkbox"
           name="is_listed"
           value="1"
-          class="mt-1 h-5 w-5 shrink-0 accent-brand-600"
+          class="mt-0.5 h-7 w-7 shrink-0 accent-brand-600"
           {% if business.is_listed %}checked{% endif %}
         />
         <span class="text-sm">
-          <span class="block font-bold">نمایش در فهرست عمومی سرویسا</span>
+          <span class="block font-bold">نمایش در فهرست عمومی چرخیار</span>
           <span class="text-ink-muted">
             در صفحه‌ی «تعویض روغنی در {{ business.city|default:"شهرت" }}» به
             مشتری‌های جدید نشان داده می‌شوی.
@@ -120,7 +137,7 @@
   </section>
 
   {# ==================== برندها و مدل‌ها ==================== #}
-  <section class="reveal card card-pad mb-5">
+  <section id="set-brands" class="reveal card card-pad mb-5 scroll-mt-20">
     <div class="flex items-center gap-2 mb-4">
       <span
         class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600"
@@ -181,11 +198,12 @@
           <button
             type="button"
             @click="open = !open"
-            class="flex flex-1 items-center gap-2 min-w-0 text-right"
+            class="flex min-h-[2.75rem] min-w-0 flex-1 items-center gap-2 text-right"
+            :aria-expanded="open"
           >
             <svg
-              class="h-4 w-4 shrink-0 text-ink-muted transition-transform"
-              :class="open ? 'rotate-90' : ''"
+              class="h-5 w-5 shrink-0 text-ink-muted transition-transform"
+              :class="open ? '-rotate-90' : ''"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -193,9 +211,9 @@
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="m9 18 6-6-6-6" />
+              <path d="m15 18-6-6 6-6" />
             </svg>
-            <span class="font-bold truncate">{{ brand.name }}</span>
+            <span class="font-black truncate">{{ brand.name }}</span>
             <span class="chip-count">{{ brand.models.count }} مدل</span>
           </button>
           <form method="post" class="flex items-center gap-1 shrink-0">
@@ -339,7 +357,7 @@
 
   {# ==================== گزینه‌های ساده (رنگ/روغن/سوخت) ==================== #}
   {% for group in options_by_kind %}
-  <section class="reveal card card-pad mb-5">
+  <section id="set-opt-{{ forloop.counter }}" class="reveal card card-pad mb-5 scroll-mt-20">
     <h2 class="text-lg mb-4">{{ group.label }}</h2>
 
     <div class="flex flex-wrap gap-2 mb-4">
@@ -407,7 +425,7 @@
   {% endfor %}
 
   {# ==================== خدمات و محصولات ==================== #}
-  <section class="reveal card card-pad mb-5">
+  <section id="set-services" class="reveal card card-pad mb-5 scroll-mt-20">
     <div class="flex items-center gap-2 mb-4">
       <span
         class="grid h-9 w-9 place-items-center rounded-xl bg-accent-50 text-accent-600"
@@ -430,7 +448,7 @@
 
     <p class="mb-4 text-sm text-ink-muted">
       خدمت‌های اختصاصیِ کسب‌وکارت را اینجا اضافه کن. اینها کنار خدمات
-      سراسریِ سرویسا در فهرست محصولات نمایش داده می‌شوند.
+      سراسریِ چرخیار در فهرست محصولات نمایش داده می‌شوند.
     </p>
 
     {# افزودن خدمت جدید #}
@@ -555,11 +573,11 @@
       {% endfor %}
     </div>
 
-    {# خدمات سراسریِ سرویسا (فقط نمایش) #}
+    {# خدمات سراسریِ چرخیار (فقط نمایش) #}
     {% if platform_products %}
     <div class="border-t border-slate-100 pt-4">
       <p class="mb-2 text-xs font-bold text-ink-muted">
-        خدمات سراسری سرویسا (برای همه فعال)
+        خدمات سراسری چرخیار (برای همه فعال)
       </p>
       <div class="flex flex-wrap gap-2">
         {% for p in platform_products %}

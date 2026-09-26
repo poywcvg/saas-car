@@ -1,74 +1,78 @@
 {% extends "dash_base.html" %}
 {% load jalali_tags %}
 
-{% block title %}مشتریان{% endblock %}
+{% block title %}مشتری‌ها{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-2xl">
+<div class="mx-auto max-w-2xl space-y-4">
 
-    <div class="reveal flex items-center justify-between gap-4 mb-5">
-        <div>
-            <p class="text-sm text-ink-muted">{{ business.name }}</p>
-            <h1 class="text-2xl sm:text-3xl mt-0.5">مشتریان</h1>
-        </div>
-        <a href="{% url 'customers:add' %}" class="btn-primary btn-lg">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            مشتری
-        </a>
+  <header class="reveal flex items-center justify-between gap-3">
+    <h1 class="flex items-center gap-2 text-2xl font-black sm:text-3xl">
+      <span class="cy-tile-icon cy-tone-green !h-12 !w-12">{% include "partials/cy_icon.html" with name="users" %}</span>
+      مشتری‌ها
+      {% if not q %}<span class="num rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-black text-ink-soft">{{ customers|length|fa }}</span>{% endif %}
+    </h1>
+    <a href="{% url 'customers:add' %}" class="btn-primary btn-lg !rounded-2xl">
+      {% include "partials/cy_icon.html" with name="user-plus" cls="h-5 w-5" %}
+      <span>جدید</span>
+    </a>
+  </header>
+
+  <form method="get" class="reveal cy-bigsearch" role="search">
+    <span class="grid h-11 w-11 shrink-0 place-items-center text-ink-muted">{% include "partials/cy_icon.html" with name="search" cls="h-6 w-6" %}</span>
+    <input type="search" name="q" value="{{ q }}" placeholder="اسم، موبایل یا پلاک…" aria-label="پیدا کردن مشتری" enterkeyhint="search" autocomplete="off">
+    <button type="submit" class="btn-primary !rounded-2xl">پیدا کن</button>
+  </form>
+
+  {% if q %}
+  <p class="reveal flex items-center gap-2 text-sm font-bold text-ink-muted">
+    نتیجه برای «<span class="text-ink">{{ q|fa }}</span>»
+    <a href="{% url 'customers:list' %}" class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 font-extrabold text-ink-soft hover:bg-slate-200">
+      {% include "partials/cy_icon.html" with name="close" cls="h-3.5 w-3.5" sw="2.8" %} همه
+    </a>
+  </p>
+  {% endif %}
+
+  <div class="stagger space-y-2.5">
+    {% for customer in customers %}
+    {% with st=customer.status %}
+    <div class="cy-person" style="--row-tone: {% if st == 'overdue' %}#dc2626{% elif st == 'due_soon' %}#f59e0b{% elif st == 'ok' %}#16a34a{% else %}#cbd5e1{% endif %}">
+      <a href="{% url 'customers:detail' pk=customer.pk %}" class="flex min-w-0 flex-1 items-center gap-3">
+        <span class="cy-avatar {% if st == 'overdue' %}cy-tone-red{% elif st == 'due_soon' %}cy-tone-orange{% elif st == 'ok' %}cy-tone-green{% else %}cy-tone-slate{% endif %}">{{ customer.full_name|first }}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-base font-black text-ink">{{ customer.full_name }}</span>
+          <span class="num block truncate text-sm font-bold text-ink-muted" dir="ltr" style="text-align:right">{{ customer.phone|fa }}</span>
+          <span class="mt-1 flex flex-wrap items-center gap-1.5">
+            {% if st == 'overdue' %}<span class="cy-chip-due cy-due-red">دیر شده</span>
+            {% elif st == 'due_soon' %}<span class="cy-chip-due cy-due-yellow">نزدیکه</span>
+            {% elif st == 'ok' %}<span class="cy-chip-due cy-due-green">مرتبه</span>{% endif %}
+            {% for v in customer.vehicles.all|slice:":2" %}
+            <span class="inline-flex items-center gap-1 text-xs font-bold text-ink-muted">{% include "partials/cy_icon.html" with name="car" cls="h-3.5 w-3.5" %}{{ v.display_name|default:"خودرو"|truncatechars:18 }}</span>
+            {% empty %}
+            <span class="text-xs font-bold text-ink-muted">بدون ماشین</span>
+            {% endfor %}
+          </span>
+        </span>
+      </a>
+      <a href="tel:{{ customer.phone }}" class="cy-round cy-round-call" aria-label="زنگ به {{ customer.full_name }}">
+        {% include "partials/cy_icon.html" with name="phone" %} زنگ
+      </a>
     </div>
-
-    {# جست‌وجو — فیلد uiverse + دکمه‌ی متنیِ واضح #}
-    <form method="get" class="reveal mb-3 flex items-center gap-2">
-        <label class="search-field flex-1">
-            <button type="submit" aria-label="جست‌وجو">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            </button>
-            <input type="search" name="q" value="{{ q }}" placeholder="جست‌وجوی نام یا شماره…" />
-        </label>
-        <button type="submit" class="btn-primary shrink-0">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            جست‌وجو
-        </button>
-    </form>
-
-    {% if q %}
-    <div class="reveal mb-4 flex items-center gap-2 text-sm text-ink-muted">
-        <span>نتایج برای «<span class="font-bold text-ink">{{ q }}</span>»</span>
-        <a href="{% url 'customers:list' %}" class="inline-flex items-center gap-1 font-bold text-brand-600 hover:text-brand-700">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            پاک کردن
-        </a>
+    {% endwith %}
+    {% empty %}
+    <div class="card card-pad py-10 text-center">
+      <span class="cy-tile-icon cy-tone-sky mx-auto !h-16 !w-16">{% include "partials/cy_icon.html" with name="user-plus" cls="!h-8 !w-8" %}</span>
+      {% if q %}
+      <p class="mt-3 text-lg font-black">کسی پیدا نشد</p>
+      <p class="mt-1 text-sm font-bold text-ink-muted">شاید مشتری تازه است.</p>
+      <a href="{% url 'customers:add' %}" class="btn-primary btn-lg mt-4 !rounded-2xl">ثبت مشتری جدید</a>
+      {% else %}
+      <p class="mt-3 text-lg font-black">هنوز مشتری نداری</p>
+      <p class="mt-1 text-sm font-bold text-ink-muted">اولین مشتری را ثبت کن.</p>
+      <a href="{% url 'customers:add' %}" class="btn-primary btn-lg mt-4 !rounded-2xl">ثبت اولین مشتری</a>
+      {% endif %}
     </div>
-    {% endif %}
-
-    <div class="stagger space-y-2">
-        {% for customer in customers %}
-        <a href="{% url 'customers:detail' pk=customer.pk %}"
-           class="card card-pad card-interactive flex items-center gap-3">
-            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 font-black">
-                {{ customer.full_name|first }}
-            </span>
-            <div class="min-w-0 flex-1">
-                <h3 class="text-base truncate">{{ customer.full_name }}</h3>
-                <p class="text-xs text-ink-muted num" dir="ltr">{{ customer.phone|fa }}</p>
-            </div>
-            <span class="{{ customer.status_meta.badge }} shrink-0">{{ customer.status_meta.label }}</span>
-        </a>
-        {% empty %}
-        <div class="card card-pad text-center py-12">
-            <span class="grid h-16 w-16 mx-auto place-items-center rounded-2xl bg-surface-muted text-ink-muted mb-4">
-                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-            </span>
-            {% if q %}
-            <h3 class="text-lg">مشتری‌ای پیدا نشد</h3>
-            <p class="mt-1 text-ink-muted">برای «{{ q }}» نتیجه‌ای نبود.</p>
-            {% else %}
-            <h3 class="text-lg">هنوز مشتری‌ای ثبت نشده</h3>
-            <a href="{% url 'customers:add' %}" class="btn-primary mt-4">افزودن اولین مشتری</a>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

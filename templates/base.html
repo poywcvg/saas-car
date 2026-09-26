@@ -7,21 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1f47f5">
     {# پسوند برند؛ سایتِ هر کسب‌وکار آن را خالی می‌کند تا برندِ خودش بماند. #}
-    <title>{% block title %}سرویسا{% endblock %}{% block title_suffix %} | سرویسا{% endblock %}</title>
+    <title>{% block title %}چرخیار{% endblock %}{% block title_suffix %} | چرخیار{% endblock %}</title>
 
     {# ===== سئو: توضیح، نشانی متعارف و اشتراک‌گذاری ===== #}
-    <meta name="description" content="{% block meta_description %}سرویسا؛ نرم‌افزار مدیریت تعویض روغنی و خدمات خودرو — باشگاه مشتریان، سابقه‌ی سرویس و یادآوری پیامکی.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}چرخیار؛ نرم‌افزار مدیریت تعویض روغنی و خدمات خودرو — باشگاه مشتریان، سابقه‌ی سرویس و یادآوری پیامکی.{% endblock %}">
     <link rel="canonical" href="{% block canonical %}{{ seo_canonical }}{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large{% endblock %}">
 
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:site_name" content="{{ seo_site_name }}">
     <meta property="og:locale" content="fa_IR">
     {# جنگو اجازه‌ی استفاده‌ی دوباره از یک بلوک را نمی‌دهد، پس og جداگانه تعریف شده #}
-    <meta property="og:title" content="{% block og_title %}سرویسا — نرم‌افزار تعویض روغنی و خدمات خودرو{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}چرخیار — نرم‌افزار تعویض روغنی و خدمات خودرو{% endblock %}">
     <meta property="og:description" content="{% block og_description %}باشگاه مشتریان، سابقه‌ی سرویس و یادآوری خودکار پیامکی برای تعویض روغنی‌ها.{% endblock %}">
     <meta property="og:url" content="{{ seo_canonical }}">
+    {% block og_image %}
+    <meta property="og:image" content="{{ seo_og_image }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="چرخیار — نرم‌افزار تعویض روغنی">
+    {% endblock %}
+    {# توییتر/ایکس در نبودِ twitter:title از og:title استفاده می‌کند #}
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ seo_og_image }}">
+
+    {# ===== سئوی محلی: استان و شهر (کمک به نتایجِ «نزدیکِ من») ===== #}
+    <meta name="geo.region" content="{{ seo_region_code }}">
+    <meta name="geo.placename" content="{{ seo_geo_city }}">
+    {% if seo_geo %}
+    <meta name="geo.position" content="{{ seo_geo.0 }};{{ seo_geo.1 }}">
+    <meta name="ICBM" content="{{ seo_geo.0 }}, {{ seo_geo.1 }}">
+    {% endif %}
+
+    {# ===== تأیید مالکیت در کنسول‌های جست‌وجو (از متغیر محیطی) ===== #}
+    {% if seo_verify.google %}<meta name="google-site-verification" content="{{ seo_verify.google }}">{% endif %}
+    {% if seo_verify.bing %}<meta name="msvalidate.01" content="{{ seo_verify.bing }}">{% endif %}
+    {% if seo_verify.yandex %}<meta name="yandex-verification" content="{{ seo_verify.yandex }}">{% endif %}
+
+    {# ===== آیکون‌ها و مانیفست ===== #}
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="icon" href="{% static 'img/favicon-48.png' %}" type="image/png" sizes="48x48">
+    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    {% if not request.is_tenant %}
+    <link rel="alternate" type="application/rss+xml" title="وبلاگ چرخیار" href="{% url 'blog:feed' %}">
+    {% endif %}
 
     {% block jsonld %}{% endblock %}
 
@@ -64,8 +94,8 @@
     {# ===== پردهٔ برند (یک‌بار در هر نشست) ===== #}
     <div id="brand-curtain" aria-hidden="true">
         <div class="mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
-            <span class="name">سرویسا</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/><path d="M12 7.5c1.5 2 2.6 3.4 2.6 4.9a2.6 2.6 0 0 1-5.2 0c0-1.5 1.1-2.9 2.6-4.9z"/><path d="M19 3.5v3.3h-3.3"/></svg>
+            <span class="name">چرخیار</span>
         </div>
         <div class="track"></div>
     </div>
@@ -81,9 +111,9 @@
 
             <a href="{% url 'home' %}" class="flex items-center gap-2 shrink-0">
                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/><path d="M12 7.5c1.5 2 2.6 3.4 2.6 4.9a2.6 2.6 0 0 1-5.2 0c0-1.5 1.1-2.9 2.6-4.9z"/><path d="M19 3.5v3.3h-3.3"/></svg>
                 </span>
-                <span class="text-lg font-black text-ink">سرویسا</span>
+                <span class="text-lg font-black text-ink">چرخیار</span>
             </a>
 
             {# لینک‌های دسکتاپ #}
@@ -161,14 +191,14 @@
     {% block footer %}
     <footer class="site-footer mt-16">
         <div class="container-app py-12">
-            <div class="grid gap-8 md:grid-cols-[1.4fr_1fr_1fr]">
+            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                 {# برند + معرفی #}
                 <div>
                     <a href="{% url 'home' %}" class="flex items-center gap-2 mb-3">
                         <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-pop">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/><path d="M12 7.5c1.5 2 2.6 3.4 2.6 4.9a2.6 2.6 0 0 1-5.2 0c0-1.5 1.1-2.9 2.6-4.9z"/><path d="M19 3.5v3.3h-3.3"/></svg>
                         </span>
-                        <span class="text-lg font-black text-ink">سرویسا</span>
+                        <span class="text-lg font-black text-ink">چرخیار</span>
                     </a>
                     <p class="text-sm text-ink-muted leading-7 max-w-xs">
                         پلتفرم باشگاه مشتریان و یادآوری سرویس برای کسب‌وکارهای خدمات خودرو — ساده، سریع و حرفه‌ای.
@@ -179,9 +209,9 @@
                 <div>
                     <h3 class="text-sm font-extrabold text-ink mb-3">دسترسی سریع</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="/#products" class="footer-link">محصولات</a></li>
-                        <li><a href="/#features" class="footer-link">چرا سرویسا</a></li>
-                        <li><a href="{% url 'blog:index' %}" class="footer-link">وبلاگ</a></li>
+                        <li><a href="/#products" class="footer-link">نرم‌افزار تعویض روغنی</a></li>
+                        <li><a href="/#features" class="footer-link">چرا چرخیار</a></li>
+                        <li><a href="{% url 'blog:index' %}" class="footer-link">وبلاگ نگهداری خودرو</a></li>
                         {% if user.is_authenticated %}
                         <li><a href="{% url 'businesses:dashboard' %}" class="footer-link">داشبورد</a></li>
                         {% else %}
@@ -191,25 +221,44 @@
                     </ul>
                 </div>
 
+                {# صفحه‌های شهر — لینک داخلی برای سئوی محلی #}
+                <div>
+                    <h3 class="text-sm font-extrabold text-ink mb-3">تعویض روغنی در شهرها</h3>
+                    <ul class="space-y-2 text-sm">
+                        {% for c in seo_footer_cities %}
+                        <li><a href="{{ c.path }}" class="footer-link">تعویض روغنی در {{ c.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                 {# تماس / شبکه‌ها #}
                 <div>
                     <h3 class="text-sm font-extrabold text-ink mb-3">با ما در ارتباط باشید</h3>
+                    {% if seo_social.instagram or seo_social.telegram or seo_social.whatsapp %}
                     <div class="flex items-center gap-2">
-                        <a href="#" aria-label="اینستاگرام" class="footer-social">
+                        {% if seo_social.instagram %}
+                        <a href="{{ seo_social.instagram }}" target="_blank" rel="noopener me" aria-label="اینستاگرام چرخیار" class="footer-social">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                         </a>
-                        <a href="#" aria-label="تلگرام" class="footer-social">
+                        {% endif %}
+                        {% if seo_social.telegram %}
+                        <a href="{{ seo_social.telegram }}" target="_blank" rel="noopener me" aria-label="تلگرام چرخیار" class="footer-social">
                             <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21.94 4.58 18.6 20.3c-.25 1.11-.92 1.38-1.86.86l-5.15-3.8-2.48 2.39c-.28.28-.5.5-1.03.5l.37-5.24 9.53-8.61c.41-.37-.09-.57-.64-.2L5.72 13.06.66 11.48c-1.1-.34-1.12-1.1.23-1.63l19.16-7.39c.92-.34 1.72.2 1.89 2.12z"/></svg>
                         </a>
-                        <a href="#" aria-label="واتساپ" class="footer-social">
+                        {% endif %}
+                        {% if seo_social.whatsapp %}
+                        <a href="{{ seo_social.whatsapp }}" target="_blank" rel="noopener me" aria-label="واتساپ چرخیار" class="footer-social">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         </a>
+                        {% endif %}
                     </div>
+                    {% endif %}
+                    <p class="mt-3 text-sm text-ink-muted leading-7">پشتیبانی برای تعویض روغنی‌های {{ seo_primary_city }} و سراسر استان کرمان.</p>
                 </div>
             </div>
 
             <div class="mt-10 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-muted">
-                <p>© {% now "Y" %} سرویسا — تمام حقوق محفوظ است</p>
+                <p>© {% now "Y" %} چرخیار — تمام حقوق محفوظ است</p>
                 <p>ساخته‌شده برای کسب‌وکارهای خدمات خودرو</p>
             </div>
         </div>

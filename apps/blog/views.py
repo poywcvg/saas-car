@@ -71,7 +71,7 @@ def blog_index(request):
         "robots_noindex": bool(q),
         "canonical": _canonical("/blog/", page.number if not q else 0),
         "jsonld_crumbs": seo.json_ld(
-            seo.breadcrumb_ld([("سرویسا", "/"), ("وبلاگ", "/blog/")])
+            seo.breadcrumb_ld([("چرخیار", "/"), ("وبلاگ", "/blog/")])
         ),
         "jsonld_blog": seo.json_ld(
             seo.blog_index_ld(list(page.object_list[:5]), seo.absolute_url("/blog/"))
@@ -99,7 +99,7 @@ def category_detail(request, slug):
         "jsonld_crumbs": seo.json_ld(
             seo.breadcrumb_ld(
                 [
-                    ("سرویسا", "/"),
+                    ("چرخیار", "/"),
                     ("وبلاگ", "/blog/"),
                     (category.title, category.get_absolute_url()),
                 ]
@@ -109,7 +109,7 @@ def category_detail(request, slug):
             seo.blog_index_ld(
                 list(page.object_list[:5]),
                 seo.absolute_url(category.get_absolute_url()),
-                name=f"{category.title} — وبلاگ سرویسا",
+                name=f"{category.title} — وبلاگ چرخیار",
             )
         ),
     }
@@ -138,7 +138,7 @@ def post_detail(request, slug):
         seo.json_ld(
             seo.breadcrumb_ld(
                 [
-                    ("سرویسا", "/"),
+                    ("چرخیار", "/"),
                     ("وبلاگ", "/blog/"),
                     (post.category.title, post.category.get_absolute_url()),
                     (post.title, post.get_absolute_url()),
@@ -160,6 +160,8 @@ def post_detail(request, slug):
         "faqs": faqs,
         "categories": _categories_with_counts(),
         "canonical": url,
+        # og:image همان تصویرِ BlogPosting (og_image → کاور → تصویر پیش‌فرض)
+        "share_image": seo.post_image(post),
         # اجزا از core.seo.json_ld قبلاً امن شده‌اند؛ اتصالشان هم امن می‌ماند
         "jsonld_all": mark_safe("".join(str(part) for part in jsonld_parts)),
     }

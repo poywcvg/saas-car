@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='business',
             name='subdomain',
-            field=models.SlugField(blank=True, help_text='نشانی سایت شما: نام\u200cشما.servisa.ir', max_length=32, null=True, unique=True, validators=[django.core.validators.RegexValidator(message='ساب\u200cدامین فقط حروف انگلیسی کوچک، عدد و خط تیره (۳ تا ۳۲ نویسه).', regex='^[a-z0-9]([a-z0-9-]{1,30}[a-z0-9])$')], verbose_name='ساب\u200cدامین'),
+            field=models.SlugField(blank=True, help_text='نشانی سایت شما: نام\u200cشما.charkhyar.ir', max_length=32, null=True, unique=True, validators=[django.core.validators.RegexValidator(message='ساب\u200cدامین فقط حروف انگلیسی کوچک، عدد و خط تیره (۳ تا ۳۲ نویسه).', regex='^[a-z0-9]([a-z0-9-]{1,30}[a-z0-9])$')], verbose_name='ساب\u200cدامین'),
         ),
         migrations.AddField(
             model_name='business',

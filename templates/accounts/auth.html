@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{# صفحه‌ی خصوصی/کاربردی — نباید در نتایج گوگل بیاید #}
+{% block robots %}noindex, follow{% endblock %}
 
 {% block title %}{% if active == 'register' %}ثبت‌ نام{% elif active == 'otp' %}ورود با کد تایید{% else %}ورود{% endif %}{% endblock %}
 

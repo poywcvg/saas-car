@@ -3,77 +3,107 @@
 {% block title %}ویرایش {{ member.get_full_name|default:member.username }}{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-2xl space-y-6">
+<div class="mx-auto max-w-xl space-y-5">
 
-    <div class="reveal">
-        <a href="{% url 'accounts:team' %}" class="inline-flex items-center gap-1 text-sm font-bold text-ink-muted hover:text-ink mb-3">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            بازگشت به اعضای تیم
-        </a>
-        <div class="flex items-center gap-4">
-            <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 font-black text-xl">
-                {{ member.username|first|upper }}
-            </span>
-            <div>
-                <h1 class="text-2xl sm:text-3xl">{{ member.get_full_name|default:member.username }}</h1>
-                <p class="mt-0.5 text-sm text-ink-muted" dir="ltr">@{{ member.username }}</p>
-            </div>
-        </div>
+  <a href="{% url 'accounts:team' %}" class="cy-back">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" sw="2.6" %} <span>اعضای تیم</span>
+  </a>
+
+  <header class="reveal flex items-center gap-3">
+    <span class="cy-avatar cy-tone-blue !h-14 !w-14 !rounded-2xl !text-xl">{{ member.get_full_name|default:member.username|first|upper }}</span>
+    <div class="min-w-0">
+      <h1 class="truncate text-2xl font-black sm:text-3xl">{{ member.get_full_name|default:member.username }}</h1>
+      <p class="truncate text-sm font-bold text-ink-muted" dir="ltr" style="text-align:right">@{{ member.username }}</p>
     </div>
+  </header>
 
-    <form method="post" novalidate class="reveal space-y-4">
-        {% csrf_token %}
+  <form method="post" novalidate class="space-y-4">
+    {% csrf_token %}
 
-        {# مشخصات تماس #}
-        <div class="card card-pad space-y-4">
-            <h2 class="text-lg">مشخصات کاربر</h2>
-            <div class="grid sm:grid-cols-2 gap-4">
-                {% include 'partials/field.html' with field=uform.first_name %}
-                {% include 'partials/field.html' with field=uform.last_name %}
-            </div>
-            {% include 'partials/field.html' with field=uform.phone %}
-            {% include 'partials/field.html' with field=uform.email %}
-        </div>
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">۱</span>
+        <div><p class="cy-step-title">مشخصات</p></div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {% include 'partials/field.html' with field=uform.first_name %}
+        {% include 'partials/field.html' with field=uform.last_name %}
+      </div>
+      {% include 'partials/field.html' with field=uform.phone %}
+      {% include 'partials/field.html' with field=uform.email %}
+    </section>
 
-        {# سطح دسترسی — فقط مالک، نه برای خودش #}
-        {% if can_manage_access %}
-        <div class="card card-pad space-y-4">
-            <h2 class="text-lg">سطح دسترسی</h2>
-            {% include 'partials/field.html' with field=rform.role %}
-            <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3.5 cursor-pointer hover:bg-surface-soft transition">
-                <span>
-                    <span class="block text-sm font-bold">حساب فعال باشد</span>
-                    <span class="block text-xs text-ink-muted mt-0.5">حساب غیرفعال نمی‌تواند وارد شود.</span>
-                </span>
-                <input type="checkbox" name="is_active" value="1"
-                       {% if member.is_active %}checked{% endif %}
-                       class="h-5 w-5 shrink-0 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-            </label>
-        </div>
-        {% elif is_self %}
-        <p class="text-xs text-ink-muted font-medium">نقش و وضعیت حساب خودتان را نمی‌توانید از اینجا تغییر دهید.</p>
-        {% endif %}
-
-        <button type="submit" class="btn-primary btn-block btn-lg">ذخیره تغییرات</button>
-    </form>
-
-    {# حذف از تیم — فقط مالک، نه برای خودش #}
+    {# سطح دسترسی — فقط مالک، نه برای خودش #}
     {% if can_manage_access %}
-    <div class="reveal card card-pad border-danger/30">
-        <h2 class="text-lg text-danger">حذف از تیم</h2>
-        <p class="mt-1 text-sm text-ink-muted leading-relaxed">
-            عضویت «{{ member.get_full_name|default:member.username }}» در {{ business.name }} حذف می‌شود؛
-            حساب کاربری او باقی می‌ماند.
-        </p>
-        <form method="post" action="{% url 'accounts:team_remove' pk=member.pk %}" class="mt-4">
-            {% csrf_token %}
-            <button type="submit" class="btn-danger"
-                    data-confirm="«{{ member.get_full_name|default:member.username }}» از تیم حذف شود؟">
-                حذف از تیم
-            </button>
-        </form>
-    </div>
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">۲</span>
+        <div>
+          <p class="cy-step-title">چه کاره است؟</p>
+          <p class="cy-step-hint">یکی را بزن.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="نقش در تیم">
+        {% for value, label in rform.role.field.choices %}
+        <label class="cy-role-pick">
+          <input type="radio" name="role" value="{{ value }}" class="peer sr-only" {% if rform.role.value == value %}checked{% endif %}>
+          <span class="cy-tile-icon {% if value == 'owner' %}cy-tone-blue{% elif value == 'manager' %}cy-tone-green{% else %}cy-tone-orange{% endif %} !h-11 !w-11">
+            {% if value == 'owner' %}{% include "partials/cy_icon.html" with name="home" %}{% elif value == 'manager' %}{% include "partials/cy_icon.html" with name="team" %}{% else %}{% include "partials/cy_icon.html" with name="wrench" %}{% endif %}
+          </span>
+          <span class="font-black">{{ label }}</span>
+          <span class="cy-role-check" aria-hidden="true">{% include "partials/cy_icon.html" with name="check" cls="h-3.5 w-3.5" sw="3" %}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% if rform.role.errors %}<p class="text-sm font-bold text-danger">{{ rform.role.errors.0 }}</p>{% endif %}
+
+      <label class="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border-2 border-slate-200 p-3.5 transition hover:bg-surface-soft">
+        <span class="flex items-center gap-3">
+          <span class="cy-tile-icon cy-tone-green !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="check" sw="2.8" %}</span>
+          <span>
+            <span class="block font-black">اجازه‌ی ورود دارد</span>
+            <span class="mt-0.5 block text-xs font-bold text-ink-muted">اگر خاموش کنی، دیگر نمی‌تواند وارد شود.</span>
+          </span>
+        </span>
+        <span class="relative shrink-0">
+          <input type="checkbox" name="is_active" value="1" class="peer sr-only" {% if member.is_active %}checked{% endif %}>
+          <span class="block h-8 w-14 rounded-full bg-slate-300 transition peer-checked:bg-green-500 peer-focus-visible:ring-4 peer-focus-visible:ring-green-200"></span>
+          <span class="absolute right-1 top-1 h-6 w-6 rounded-full bg-white shadow transition peer-checked:-translate-x-6"></span>
+        </span>
+      </label>
+    </section>
+    {% elif is_self %}
+    <p class="flex items-center gap-2 rounded-2xl bg-surface-soft px-3 py-2.5 text-sm font-bold text-ink-muted">
+      {% include "partials/cy_icon.html" with name="alert" cls="h-4 w-4 shrink-0" %} نقش خودت را اینجا نمی‌توانی عوض کنی.
+    </p>
     {% endif %}
 
+    <div class="sticky bottom-[5.5rem] z-10 lg:bottom-4">
+      <button type="submit" class="btn-primary btn-lg btn-block !rounded-2xl !py-4 text-lg shadow-pop">
+        {% include "partials/cy_icon.html" with name="check" cls="h-6 w-6" sw="2.8" %} ذخیره
+      </button>
+    </div>
+  </form>
+
+  {# حذف از تیم — فقط مالک، نه برای خودش #}
+  {% if can_manage_access %}
+  <section class="reveal rounded-3xl border-2 border-red-100 bg-red-50/60 p-4">
+    <div class="flex items-center gap-3">
+      <span class="cy-tile-icon cy-tone-red !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="logout" %}</span>
+      <div class="min-w-0">
+        <p class="font-black text-red-800">بیرون کردن از تیم</p>
+        <p class="text-xs font-bold text-ink-muted">فقط از {{ business.name }} حذف می‌شود.</p>
+      </div>
+    </div>
+    <form method="post" action="{% url 'accounts:team_remove' pk=member.pk %}" class="mt-3">
+      {% csrf_token %}
+      <button type="submit" class="btn-danger btn-block !rounded-2xl"
+              data-confirm="«{{ member.get_full_name|default:member.username }}» از تیم حذف شود؟">
+        حذف از تیم
+      </button>
+    </form>
+  </section>
+  {% endif %}
 </div>
 {% endblock %}

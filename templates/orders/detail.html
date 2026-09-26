@@ -1,54 +1,89 @@
 {% extends "dash_base.html" %}
+{% load jalali_tags %}
 
 {% block title %}جزئیات سفارش{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-lg space-y-6">
+<div class="mx-auto max-w-xl space-y-5">
 
-    <div class="reveal">
-        <a href="{% url 'orders:list' %}" class="inline-flex items-center gap-1 text-sm font-bold text-ink-muted hover:text-ink transition mb-3">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            بازگشت به سفارشات
-        </a>
-        <h1 class="text-2xl sm:text-3xl">جزئیات سفارش</h1>
+  <a href="{% url 'orders:list' %}" class="cy-back">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" sw="2.6" %} <span>سفارش‌ها</span>
+  </a>
+
+  <section class="reveal cy-hello">
+    <div class="relative flex items-center gap-3">
+      <span class="cy-tile-icon {% if order.status == 'confirmed' %}cy-tone-green{% elif order.status == 'cancelled' %}cy-tone-red{% else %}cy-tone-orange{% endif %} !h-16 !w-16 shrink-0 !rounded-3xl">
+        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
+      </span>
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-2xl font-black">{{ order.product.title }}</h1>
+        {% if order.product.tagline %}<p class="mt-0.5 text-sm font-bold text-ink-muted">{{ order.product.tagline }}</p>{% endif %}
+      </div>
     </div>
 
-    <div class="card card-pad space-y-4">
-        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
-            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600">
-                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
-            </span>
-            <div>
-                <h2 class="text-lg font-bold">{{ order.product.title }}</h2>
-                {% if order.product.tagline %}
-                <p class="text-sm text-ink-soft">{{ order.product.tagline }}</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="space-y-3">
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-ink-muted">فروشگاه</span>
-                <span class="text-sm font-bold">{{ order.business.name }}</span>
-            </div>
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-ink-muted">وضعیت</span>
-                <span class="{% if order.status == 'confirmed' %}badge-growth{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-neutral{% endif %}">
-                    {{ order.get_status_display }}
-                </span>
-            </div>
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-ink-muted">تاریخ ثبت</span>
-                <span class="text-sm font-bold num">{{ order.created_at|date:"Y/m/d H:i" }}</span>
-            </div>
-            {% if order.note %}
-            <div class="pt-3 border-t border-slate-100">
-                <span class="text-sm text-ink-muted block mb-1">یادداشت</span>
-                <p class="text-sm">{{ order.note }}</p>
-            </div>
-            {% endif %}
-        </div>
+    <div class="relative mt-4 flex items-center gap-3 rounded-2xl bg-white/80 p-3 ring-1 ring-slate-200">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl {% if order.status == 'confirmed' %}bg-green-100 text-green-700{% elif order.status == 'cancelled' %}bg-red-100 text-red-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+        {% if order.status == 'confirmed' %}{% include "partials/cy_icon.html" with name="check" cls="h-6 w-6" sw="2.8" %}{% elif order.status == 'cancelled' %}{% include "partials/cy_icon.html" with name="close" cls="h-6 w-6" sw="2.8" %}{% else %}{% include "partials/cy_icon.html" with name="clock" cls="h-6 w-6" %}{% endif %}
+      </span>
+      <div>
+        <p class="text-xs font-bold text-ink-muted">وضعیت</p>
+        <p class="text-lg font-black">{{ order.get_status_display }}</p>
+      </div>
     </div>
+  </section>
 
+  <section class="reveal card divide-y divide-slate-100">
+    <div class="flex items-center gap-3 p-4">
+      <span class="cy-tile-icon cy-tone-blue !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="home" cls="h-5 w-5" %}</span>
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-ink-muted">برای کدام مغازه</p>
+        <p class="truncate font-black">{{ order.business.name }}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 p-4">
+      <span class="cy-tile-icon cy-tone-slate !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="calendar" cls="h-5 w-5" %}</span>
+      <div>
+        <p class="text-xs font-bold text-ink-muted">تاریخ ثبت</p>
+        <p class="font-black">{{ order.created_at|jalali }} · <span class="num">{{ order.created_at|time:"H:i"|fa }}</span></p>
+      </div>
+    </div>
+    {% if order.note %}
+    <div class="flex items-start gap-3 p-4">
+      <span class="cy-tile-icon cy-tone-violet !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="edit" cls="h-5 w-5" %}</span>
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-ink-muted">یادداشت</p>
+        <p class="font-bold">{{ order.note }}</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  {# لوکیشن مغازه — پیشنهاد آرام، بدون پنجره‌ی مزاحم #}
+  {% if can_set_location %}
+  {% url 'businesses:location' as loc_url %}
+  {% if order.business.has_location %}
+  <a href="{{ loc_url }}?b={{ order.business.pk }}&next={{ request.path|urlencode }}" class="cy-person" style="--row-tone: #16a34a">
+    <span class="cy-tile-icon cy-tone-green !h-11 !w-11 shrink-0">{% include "partials/cy_icon.html" with name="pin" cls="h-5 w-5" %}</span>
+    <span class="min-w-0 flex-1">
+      <span class="block font-black">لوکیشن مغازه ثبت شده</span>
+      <span class="block text-xs font-bold text-ink-muted">مشتری‌ها روی سایتت دکمه‌ی مسیریابی می‌بینند</span>
+    </span>
+    <span class="shrink-0 text-sm font-black text-brand-600">تغییر</span>
+  </a>
+  {% else %}
+  <section class="reveal rounded-3xl bg-gradient-to-l from-red-50 to-amber-50 p-4 ring-1 ring-red-100">
+    <div class="flex items-center gap-3">
+      <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white text-red-600 shadow-sm">{% include "partials/cy_icon.html" with name="pin" cls="h-7 w-7" %}</span>
+      <div class="min-w-0">
+        <p class="text-lg font-black">مغازه‌ات را روی نقشه بگذار</p>
+        <p class="text-sm font-bold text-ink-soft">مشتری‌ها با یک دکمه تا دمِ مغازه می‌آیند. کمتر از یک دقیقه.</p>
+      </div>
+    </div>
+    <a href="{{ loc_url }}?b={{ order.business.pk }}&next={{ request.path|urlencode }}" class="btn-primary btn-lg btn-block mt-4 !rounded-2xl">
+      {% include "partials/cy_icon.html" with name="pin" cls="h-5 w-5" %} ثبت لوکیشن
+    </a>
+  </section>
+  {% endif %}
+  {% endif %}
 </div>
 {% endblock %}

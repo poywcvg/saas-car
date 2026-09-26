@@ -24,4 +24,18 @@ urlpatterns = [
         views.reminders,
         name="reminders",
     ),
+
+    # لوکیشن مغازه روی نقشه (برای خریداران محصول)
+    path(
+        "location/",
+        views.business_location,
+        name="location",
+    ),
+
+    # ثبت سریع تعویض روغن: جست‌وجو با موبایل/پلاک/اسم
+    path(
+        "quick/",
+        views.quick_service,
+        name="quick",
+    ),
 ]

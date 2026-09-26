@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from apps.vehicles.forms import VehicleForm
 from core.access import current_business
+from core.normalize import to_ascii_digits
 from core.sms import build_reminder_text
 
 from .forms import CustomerForm
@@ -19,12 +20,15 @@ def customer_list(request):
     if not business:
         return redirect("businesses:create")
 
-    q = request.GET.get("q", "").strip()
+    # ارقام فارسی را لاتین کن تا «۰۹۱۲» هم پیدا شود؛ پلاک هم جست‌وجو می‌شود
+    q = to_ascii_digits(request.GET.get("q", "")).strip()
     customers = business.customers.prefetch_related("vehicles")
     if q:
         customers = customers.filter(
-            Q(full_name__icontains=q) | Q(phone__icontains=q)
-        )
+            Q(full_name__icontains=q)
+            | Q(phone__icontains=q)
+            | Q(vehicles__plate__icontains=q)
+        ).distinct()
 
     return render(
         request,
@@ -40,7 +44,7 @@ def customer_add(request):
         return redirect("businesses:create")
 
     if request.method == "POST":
-        cform = CustomerForm(request.POST)
+        cform = CustomerForm(request.POST, business=business)
         vform = VehicleForm(request.POST, business=business)
         # خودرو اختیاری است: فقط اگر کاربر واقعاً چیزی در بخش خودرو وارد
         # کرده، فرم خودرو اعتبارسنجی و ذخیره می‌شود؛ وگرنه فقط مشتری ثبت
@@ -70,15 +74,29 @@ def customer_add(request):
                 messages.success(
                     request, f"مشتری «{customer.full_name}» با موفقیت ثبت شد"
                 )
+            # دکمه‌ی «ثبت و تعویض روغن»: یکراست برو سراغ فرم تعویض
+            if request.POST.get("then") == "oil":
+                if has_vehicle:
+                    return redirect("oilchange:add", vehicle_pk=vehicle.pk)
+                messages.info(request, "حالا ماشینش را ثبت کن.")
+                return redirect("vehicles:add", customer_pk=customer.pk)
             return redirect("customers:detail", pk=customer.pk)
     else:
-        cform = CustomerForm()
+        # از صفحه‌ی «ثبت سریع»: شماره‌ی جست‌وجوشده از قبل پر شود
+        cform = CustomerForm(
+            business=business,
+            initial={"phone": request.GET.get("phone", "")[:20]},
+        )
         vform = VehicleForm(business=business)
 
     return render(
         request,
         "customers/add.html",
-        {"cform": cform, "vform": vform},
+        {
+            "cform": cform,
+            "vform": vform,
+            "duplicate": getattr(cform, "duplicate", None),
+        },
     )
 
 
@@ -118,7 +136,7 @@ def customer_edit(request, pk):
 
     customer = get_object_or_404(Customer, pk=pk, business=business)
     if request.method == "POST":
-        form = CustomerForm(request.POST, instance=customer)
+        form = CustomerForm(request.POST, instance=customer, business=business)
         if form.is_valid():
             form.save()
             messages.success(
@@ -126,7 +144,7 @@ def customer_edit(request, pk):
             )
             return redirect("customers:detail", pk=customer.pk)
     else:
-        form = CustomerForm(instance=customer)
+        form = CustomerForm(instance=customer, business=business)
 
     return render(
         request,

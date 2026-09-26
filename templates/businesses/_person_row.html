@@ -1,0 +1,31 @@
+{% load jalali_tags %}
+{# یک ردیفِ «زنگ بزن»: item = {vehicle, customer, days, sms_body} #}
+<div class="cy-person" style="--row-tone: {% if item.days < 0 %}#dc2626{% else %}#f59e0b{% endif %}">
+  <a href="{% url 'customers:detail' pk=item.customer.pk %}" class="cy-avatar {% if item.days < 0 %}cy-tone-red{% else %}cy-tone-orange{% endif %}" aria-hidden="true" tabindex="-1">
+    {{ item.customer.full_name|first }}
+  </a>
+  <a href="{% url 'customers:detail' pk=item.customer.pk %}" class="min-w-0 flex-1">
+    <span class="block truncate text-base font-black text-ink">{{ item.customer.full_name }}</span>
+    <span class="mt-0.5 flex items-center gap-1 truncate text-xs font-bold text-ink-muted">
+      {% include "partials/cy_icon.html" with name="car" cls="h-3.5 w-3.5 shrink-0" %}
+      <span class="truncate">{{ item.vehicle.display_name|default:"خودرو" }}</span>
+      {% if item.vehicle.plate %}<span class="num shrink-0" dir="ltr">{{ item.vehicle.plate|fa }}</span>{% endif %}
+    </span>
+    <span class="mt-1 inline-flex">
+      {% if item.days < 0 %}
+        <span class="cy-chip-due cy-due-red">{% include "partials/cy_icon.html" with name="alert" cls="h-3.5 w-3.5" sw="2.6" %}<span class="num">{{ item.days|absval|fa }}</span> روز دیر شده</span>
+      {% elif item.days == 0 %}
+        <span class="cy-chip-due cy-due-yellow">{% include "partials/cy_icon.html" with name="clock" cls="h-3.5 w-3.5" sw="2.6" %}همین امروز</span>
+      {% else %}
+        <span class="cy-chip-due cy-due-yellow">{% include "partials/cy_icon.html" with name="clock" cls="h-3.5 w-3.5" sw="2.6" %}<span class="num">{{ item.days|fa }}</span> روز مانده</span>
+      {% endif %}
+      {% if show_date %}<span class="mr-1.5 self-center text-[11px] font-bold text-ink-muted">{{ item.vehicle.effective_due_date|jalali }}</span>{% endif %}
+    </span>
+  </a>
+  <a href="tel:{{ item.customer.phone }}" class="cy-round cy-round-call" aria-label="زنگ به {{ item.customer.full_name }}">
+    {% include "partials/cy_icon.html" with name="phone" %} زنگ
+  </a>
+  <a href="sms:{{ item.customer.phone }}?&body={{ item.sms_body|urlencode }}" class="cy-round cy-round-sms" aria-label="پیامک به {{ item.customer.full_name }}">
+    {% include "partials/cy_icon.html" with name="sms" %} پیامک
+  </a>
+</div>

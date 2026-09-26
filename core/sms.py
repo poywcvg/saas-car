@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import logging
 
-from core.jalali import format_jalali
+from core.jalali import format_jalali, to_fa_digits
+from core.service_status import DUE_SOON_DAYS
 
 logger = logging.getLogger("sms")
 
@@ -16,32 +17,33 @@ def build_reminder_text(customer, public_url: str, business_name: str = "") -> s
     """متن پیامک یادآوری برای یک مشتری را می‌سازد."""
     lines = [f"سلام {customer.full_name} عزیز"]
 
-    # نزدیک‌ترین خودرو به موعد را پیدا کن
-    vehicles = [v for v in customer.vehicles.all() if v.next_due_date]
-    vehicles.sort(key=lambda v: v.next_due_date)
+    # نزدیک‌ترین خودرو به موعد (موعد مؤثر: تاریخی یا کیلومتری، هر کدام زودتر)
+    vehicles = [v for v in customer.vehicles.all() if v.effective_due_date]
+    vehicles.sort(key=lambda v: v.effective_due_date)
 
     if vehicles:
         v = vehicles[0]
-        # اطلاعات خودرو
-        car_info = v.display_name
-        if v.brand:
-            car_info = v.brand.name
-            if v.model:
-                car_info += f" {v.model.name}"
+        car_info = v.display_name or "خودروی شما"
 
-        # کیلومتر فعلی و موعد بعدی
+        # کیلومتر تخمینیِ امروز و کیلومترِ مانده
         mileage_info = ""
-        if v.current_mileage_km:
-            mileage_info = f"کارکرد فعلی: {v.current_mileage_km:,} کیلومتر"
-        if v.next_due_km:
-            km_diff = v.next_due_km - (v.current_mileage_km or 0)
-            if km_diff > 0:
-                mileage_info += f"\nتا تعویض بعدی: {km_diff:,} کیلومتر"
+        current_km = v.estimated_current_mileage or v.current_mileage_km
+        if current_km:
+            mileage_info = f"کارکرد حدودی: {current_km:,} کیلومتر"
+        remaining = v.km_remaining
+        if remaining is not None and remaining > 0:
+            mileage_info += f"\nتا تعویض بعدی: {remaining:,} کیلومتر"
 
-        lines.append(f"موعد تعویض روغن «{car_info}» نزدیکه.")
+        days = v.days_until_due
+        if days is not None and days < 0:
+            lines.append(f"موعد تعویض روغن «{car_info}» گذشته است.")
+        elif days is not None and days <= DUE_SOON_DAYS:
+            lines.append(f"موعد تعویض روغن «{car_info}» نزدیکه.")
+        else:
+            lines.append(f"یادآوری تعویض روغن «{car_info}».")
         if mileage_info:
-            lines.append(mileage_info)
-        lines.append(f"تاریخ موعد: {format_jalali(v.next_due_date)}")
+            lines.append(to_fa_digits(mileage_info.strip()))
+        lines.append(f"تاریخ موعد: {format_jalali(v.effective_due_date)}")
     else:
         lines.append("یادآوری تعویض روغن خودروی شما.")
 

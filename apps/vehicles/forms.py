@@ -1,10 +1,9 @@
-import datetime
-
 from django import forms
 
 from core.forms import StyledFormMixin
 
 from .models import Vehicle, VehicleBrand, VehicleModel, VehicleOption
+from django.utils import timezone
 
 
 INTERVAL_MONTHS_CHOICES = [
@@ -100,12 +99,8 @@ class VehicleForm(StyledFormMixin, forms.ModelForm):
         self.fields["fuel"].empty_label = "انتخاب سوخت…"
         self.fields["preferred_oil"].empty_label = "بدون پیش‌فرض"
 
-        # فیلدهای اجباری
-        self.fields["brand"].required = True
-        self.fields["model"].required = True
-        self.fields["year"].required = True
-        self.fields["fuel"].required = True
-        self.fields["current_mileage_km"].required = True
+        # همه‌ی مشخصات خودرو اختیاری است (فقط اسم و موبایل مشتری الزامی‌اند)
+        self.fields["current_mileage_km"].required = False
 
         # در دراپ‌داون فقط نام گزینه نمایش داده شود (نه «رنگ: سفید»)
         self.fields["color"].label_from_instance = lambda o: o.name
@@ -114,7 +109,7 @@ class VehicleForm(StyledFormMixin, forms.ModelForm):
         self.fields["brand"].label_from_instance = lambda o: o.name
 
         # سال ساخت: بازه‌ی معقول (ورودی عددی)
-        this_year = datetime.date.today().year
+        this_year = timezone.localdate().year
         self.fields["year"].widget.attrs.update(
             {"placeholder": f"مثلاً {this_year}", "min": 1980, "max": this_year + 1}
         )
@@ -125,6 +120,13 @@ class VehicleForm(StyledFormMixin, forms.ModelForm):
             self.models_by_brand.setdefault(m.brand_id, []).append(
                 {"id": m.id, "name": m.name}
             )
+
+    def clean_current_mileage_km(self):
+        # خالی = کیلومتر قبلی (یا ۰ برای خودروی تازه)؛ ستون null نمی‌پذیرد
+        value = self.cleaned_data.get("current_mileage_km")
+        if value is None:
+            return self.instance.current_mileage_km or 0
+        return value
 
     def clean(self):
         cleaned = super().clean()

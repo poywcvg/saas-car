@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load jalali_tags %}
+{# صفحه‌ی خصوصی/کاربردی — نباید در نتایج گوگل بیاید #}
+{% block robots %}noindex, nofollow{% endblock %}
 
 {% block title %}وضعیت خودروی {{ customer.full_name }}{% endblock %}
 
@@ -17,7 +19,7 @@
 
 {% block footer %}
 <footer class="mt-12 py-6 text-center text-xs text-ink-muted">
-    <p>ارائه‌شده با <span class="font-bold text-brand-600">سرویسا</span></p>
+    <p>ارائه‌شده با <span class="font-bold text-brand-600">چرخیار</span></p>
 </footer>
 {% endblock %}
 
@@ -115,6 +117,11 @@
         </div>
         {% endfor %}
     </div>
+
+    {# لوکیشن تعمیرگاه #}
+    {% if customer.business.has_location %}
+    <div class="mt-6">{% include "partials/shop_location.html" with b=customer.business %}</div>
+    {% endif %}
 
     {# تماس با تعمیرگاه #}
     {% if customer.business.owner.phone %}

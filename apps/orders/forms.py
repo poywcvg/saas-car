@@ -1,17 +1,18 @@
 from django import forms
 
-from apps.businesses.models import Membership
+from apps.businesses.models import Business
 from core.forms import StyledFormMixin
 
 from .models import Order
 
 
 class OrderForm(StyledFormMixin, forms.ModelForm):
+    # فقط کسب‌وکارهایی که کاربر عضوشان است؛ مستقیم Business برمی‌گرداند
+    # تا ModelForm بتواند آن را روی Order.business بگذارد.
     business = forms.ModelChoiceField(
-        queryset=Membership.objects.none(),
+        queryset=Business.objects.none(),
         label="فروشگاه",
         empty_label="انتخاب کنید…",
-        to_field_name="business_id",
     )
 
     class Meta:
@@ -28,16 +29,17 @@ class OrderForm(StyledFormMixin, forms.ModelForm):
         self.product = product
 
         if user:
-            memberships = Membership.objects.filter(user=user).select_related("business")
-            self.fields["business"].queryset = memberships
-            self.fields["business"].label_from_instance = lambda m: m.business.name
+            businesses = Business.objects.filter(memberships__user=user).distinct()
+            self.fields["business"].queryset = businesses
+            self.fields["business"].label_from_instance = lambda b: b.name
+            # یک مغازه = از قبل انتخاب شده، کاربر لازم نیست کاری کند
+            if not self.is_bound and len(businesses) == 1:
+                self.initial["business"] = businesses[0].pk
 
     def save(self, commit=True):
         order = super().save(commit=False)
         order.user = self.user
         order.product = self.product
-        membership = self.cleaned_data["business"]
-        order.business = membership.business
         if commit:
             order.save()
         return order

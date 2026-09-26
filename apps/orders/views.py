@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.businesses.models import Membership
+from apps.businesses.views import can_edit_location
 from apps.catalog.models import Product
 
 from .forms import OrderForm
@@ -21,9 +22,10 @@ def order_create(request, product_id):
     if request.method == "POST":
         form = OrderForm(user=request.user, product=product, data=request.POST)
         if form.is_valid():
-            form.save()
+            order = form.save()
             messages.success(request, "سفارش ثبت شد.")
-            return redirect("orders:list")
+            # صفحه‌ی سفارش، پیشنهادِ (بی‌مزاحمتِ) ثبت لوکیشن مغازه را نشان می‌دهد
+            return redirect("orders:detail", pk=order.pk)
     else:
         form = OrderForm(user=request.user, product=product)
 
@@ -49,4 +51,13 @@ def order_detail(request, pk):
         pk=pk,
         user=request.user,
     )
-    return render(request, "orders/detail.html", {"order": order})
+    business = order.business
+    return render(
+        request,
+        "orders/detail.html",
+        {
+            "order": order,
+            "can_set_location": order.status != Order.Status.CANCELLED
+            and can_edit_location(request.user, business),
+        },
+    )

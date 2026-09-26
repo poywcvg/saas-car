@@ -1,55 +1,49 @@
 {% extends "dash_base.html" %}
+{% load jalali_tags %}
 
-{% block title %}سفارشات من{% endblock %}
+{% block title %}سفارش‌های من{% endblock %}
 
 {% block app_content %}
-<div class="mx-auto max-w-6xl space-y-8">
+<div class="mx-auto max-w-2xl space-y-4">
 
-    <div class="reveal flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl">سفارشات من</h1>
-            <p class="mt-1 text-ink-soft font-medium">لیست سفارشات ثبت‌شده توسط شما.</p>
-        </div>
-        <a href="{% url 'catalog:products' %}" class="btn-primary self-start sm:self-auto">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            سفارش جدید
-        </a>
+  <header class="reveal flex items-center justify-between gap-3">
+    <h1 class="flex items-center gap-2 text-2xl font-black sm:text-3xl">
+      <span class="cy-tile-icon cy-tone-violet !h-12 !w-12">{% include "partials/cy_icon.html" with name="bag" %}</span>
+      سفارش‌ها
+      {% if orders %}<span class="num rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-black text-ink-soft">{{ orders|length|fa }}</span>{% endif %}
+    </h1>
+    <a href="{% url 'catalog:products' %}" class="btn-primary btn-lg !rounded-2xl">
+      {% include "partials/cy_icon.html" with name="plus" cls="h-5 w-5" sw="2.6" %} <span>جدید</span>
+    </a>
+  </header>
+
+  <div class="stagger space-y-2.5">
+    {% for order in orders %}
+    <a href="{% url 'orders:detail' pk=order.pk %}" class="cy-person"
+       style="--row-tone: {% if order.status == 'confirmed' %}#16a34a{% elif order.status == 'cancelled' %}#dc2626{% else %}#f59e0b{% endif %}">
+      <span class="cy-tile-icon {% if order.status == 'confirmed' %}cy-tone-green{% elif order.status == 'cancelled' %}cy-tone-red{% else %}cy-tone-orange{% endif %} !h-12 !w-12 shrink-0">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-base font-black text-ink">{{ order.product.title }}</span>
+        <span class="block truncate text-sm font-bold text-ink-muted">{{ order.business.name }}</span>
+        <span class="mt-1 flex flex-wrap items-center gap-1.5">
+          <span class="cy-chip-due {% if order.status == 'confirmed' %}cy-due-green{% elif order.status == 'cancelled' %}cy-due-red{% else %}cy-due-yellow{% endif %}">{{ order.get_status_display }}</span>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-ink-muted">{% include "partials/cy_icon.html" with name="calendar" cls="h-3.5 w-3.5" %}{{ order.created_at|jalali }}</span>
+        </span>
+      </span>
+      <span class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-surface-soft text-ink-muted">{% include "partials/cy_icon.html" with name="next" cls="h-5 w-5" sw="2.6" %}</span>
+    </a>
+    {% empty %}
+    <div class="card card-pad py-10 text-center">
+      <span class="cy-tile-icon cy-tone-violet mx-auto !h-16 !w-16">{% include "partials/cy_icon.html" with name="bag" cls="!h-8 !w-8" %}</span>
+      <p class="mt-3 text-lg font-black">هنوز سفارشی نداری</p>
+      <p class="mt-1 text-sm font-bold text-ink-muted">از صفحه‌ی محصولات یکی را انتخاب کن.</p>
+      <a href="{% url 'catalog:products' %}" class="btn-primary btn-lg mt-4 !rounded-2xl">
+        {% include "partials/cy_icon.html" with name="box" cls="h-5 w-5" %} دیدن محصولات
+      </a>
     </div>
-
-    <div class="reveal card">
-        {% if orders %}
-        <div class="divide-y divide-slate-100">
-            {% for order in orders %}
-            <a href="{% url 'orders:detail' pk=order.pk %}" class="flex items-center gap-3 px-5 sm:px-6 py-4 hover:bg-surface-soft transition">
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ order.product.icon_svg|safe }}</svg>
-                </span>
-                <div class="min-w-0 flex-1">
-                    <p class="font-bold truncate">{{ order.product.title }}</p>
-                    <p class="text-xs text-ink-muted">{{ order.business.name }}</p>
-                </div>
-                <div class="text-left shrink-0">
-                    <span class="{% if order.status == 'confirmed' %}badge-growth{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-neutral{% endif %}">
-                        {{ order.get_status_display }}
-                    </span>
-                    <p class="text-xs text-ink-muted mt-1">{{ order.created_at|date:"Y/m/d H:i" }}</p>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="px-6 py-16 text-center">
-            <span class="grid h-14 w-14 mx-auto place-items-center rounded-2xl bg-surface-muted text-ink-muted mb-3">
-                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            </span>
-            <h3 class="text-base font-bold">هنوز سفارشی ثبت نشده</h3>
-            <p class="mt-1 text-sm text-ink-muted max-w-xs mx-auto">از صفحه محصولات می‌توانید سفارش جدید ثبت کنید.</p>
-            <a href="{% url 'catalog:products' %}" class="btn-primary mt-4">
-                مشاهده محصولات
-            </a>
-        </div>
-        {% endif %}
-    </div>
-
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

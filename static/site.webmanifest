@@ -1,0 +1,14 @@
+{
+  "name": "چرخیار — نرم‌افزار تعویض روغنی",
+  "short_name": "چرخیار",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f47f5",
+  "icons": [
+    {"src": "/static/img/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/img/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

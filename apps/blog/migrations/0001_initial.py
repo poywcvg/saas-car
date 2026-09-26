@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('faqs', models.JSONField(blank=True, default=list, help_text='لیستی از {"q": "پرسش", "a": "پاسخ"}', verbose_name='پرسش\u200cهای متداول')),
                 ('meta_title', models.CharField(blank=True, max_length=170, verbose_name='عنوان سئو (meta title)')),
                 ('meta_description', models.CharField(blank=True, max_length=300, verbose_name='توضیح سئو (meta description)')),
-                ('og_image', models.URLField(blank=True, help_text='خالی = لوگوی سرویسا.', verbose_name='تصویر اشتراک\u200cگذاری (og:image)')),
+                ('og_image', models.URLField(blank=True, help_text='خالی = لوگوی چرخیار.', verbose_name='تصویر اشتراک\u200cگذاری (og:image)')),
                 ('status', models.CharField(choices=[('draft', 'پیش\u200cنویس'), ('published', 'منتشرشده')], default='draft', max_length=10, verbose_name='وضعیت')),
                 ('published_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, help_text='پیش\u200cنویس\u200cها منتشر نمی\u200cشوند؛ زمان آینده = انتشار زمان\u200cبندی\u200cشده.', null=True, verbose_name='زمان انتشار')),
                 ('featured', models.BooleanField(default=False, verbose_name='ویژه (در صدر وبلاگ)')),

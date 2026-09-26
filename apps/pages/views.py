@@ -51,7 +51,7 @@ HOME_CONTEXT = {
         },
         {
             "title": "موعد بعدی خودکار حساب می‌شود",
-            "desc": "سرویسا بر اساس کیلومتر و زمان، موعد سرویس بعدی را محاسبه می‌کند. لازم نیست چیزی به خاطر بسپاری.",
+            "desc": "چرخیار بر اساس کیلومتر و زمان، موعد سرویس بعدی را محاسبه می‌کند. لازم نیست چیزی به خاطر بسپاری.",
             "icon": _icon('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
         },
         {
@@ -76,7 +76,11 @@ def home(request):
         Post.published.select_related("category")[:3]
     )
     # داده‌ی ساختاریافته + لینک به صفحه‌های شهر (تا گوگل آن‌ها را بخزد)
-    context["jsonld_org"] = seo.json_ld(seo.organization_ld())
+    context["jsonld_org"] = (
+        seo.json_ld(seo.organization_ld())
+        + seo.json_ld(seo.website_ld())
+        + seo.json_ld(seo.software_ld())
+    )
     context["seo_cities"] = [
         {"name": c, "path": seo.city_page_path(c)} for c in settings.SEO_CITIES
     ]

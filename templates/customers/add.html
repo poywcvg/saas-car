@@ -1,56 +1,72 @@
 {% extends "dash_base.html" %}
 
-{% block title %}افزودن مشتری{% endblock %}
+{% block title %}مشتری جدید{% endblock %}
 
 {% block app_content %}
 <div class="mx-auto max-w-xl">
 
-    {# سربرگ ساده #}
-    <div class="reveal mb-6">
-        <a href="{% url 'businesses:dashboard' %}" class="inline-flex items-center gap-1 text-sm font-bold text-ink-muted hover:text-ink mb-3">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            بازگشت
-        </a>
-        <h1 class="text-2xl sm:text-3xl">مشتری جدید</h1>
-        <p class="mt-1 text-ink-soft font-medium">فقط اسم و موبایل کافیه؛ خودرو رو می‌تونی بعداً هم اضافه کنی.</p>
+  <a href="{% url 'businesses:dashboard' %}" class="cy-back mb-4">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" sw="2.6" %} خانه
+  </a>
+
+  <header class="reveal mb-5 flex items-center gap-3">
+    <span class="cy-tile-icon cy-tone-sky !h-14 !w-14 shrink-0">{% include "partials/cy_icon.html" with name="user-plus" cls="!h-8 !w-8" %}</span>
+    <div>
+      <h1 class="text-2xl font-black sm:text-3xl">مشتری جدید</h1>
+      <p class="mt-0.5 text-sm font-bold text-ink-soft">فقط اسم و موبایل لازم است.</p>
     </div>
+  </header>
 
-    <form method="post" novalidate class="reveal">
-        {% csrf_token %}
+  {% if duplicate %}
+  <div class="reveal mb-4 flex items-center gap-3 rounded-3xl border-2 border-amber-200 bg-amber-50 p-3" role="alert">
+    <span class="cy-avatar cy-tone-orange">{{ duplicate.full_name|first }}</span>
+    <div class="min-w-0 flex-1">
+      <p class="font-black text-amber-900">این مشتری را قبلاً ثبت کرده‌ای!</p>
+      <p class="truncate text-sm font-bold text-amber-800">{{ duplicate.full_name }}</p>
+    </div>
+    <a href="{% url 'customers:detail' pk=duplicate.pk %}" class="btn-primary shrink-0 !rounded-2xl">برو به پرونده</a>
+  </div>
+  {% endif %}
 
-        {# بخش ۱: مشخصات مشتری #}
-        <div class="card card-pad space-y-4">
-            <div class="flex items-center gap-2">
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                </span>
-                <h2 class="text-lg">مشخصات مشتری</h2>
-            </div>
+  <form method="post" novalidate class="space-y-4">
+    {% csrf_token %}
 
-            {% include 'partials/field.html' with field=cform.full_name %}
-            {% include 'partials/field.html' with field=cform.phone %}
-            {% include 'partials/field.html' with field=cform.note %}
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">۱</span>
+        <div><p class="cy-step-title">مشتری کیست؟</p></div>
+      </div>
+      {% include 'partials/field.html' with field=cform.full_name %}
+      {% include 'partials/field.html' with field=cform.phone %}
+      <details {% if cform.note.value or cform.note.errors %}open{% endif %}>
+        <summary class="flex cursor-pointer list-none items-center gap-2 text-sm font-black text-ink-muted">
+          {% include "partials/cy_icon.html" with name="edit" cls="h-4 w-4" %} یادداشت (اگر خواستی)
+        </summary>
+        <div class="mt-3">{% include 'partials/field.html' with field=cform.note %}</div>
+      </details>
+    </section>
+
+    <section class="reveal card card-pad space-y-4">
+      <div class="cy-step !mb-1">
+        <span class="cy-step-num">۲</span>
+        <div>
+          <p class="cy-step-title">ماشینش چیست؟</p>
+          <p class="cy-step-hint">همه اختیاری است. هر چه می‌دانی بنویس، بقیه را خالی بگذار.</p>
         </div>
+      </div>
+      {% include 'vehicles/_form.html' with form=vform %}
+    </section>
 
-        {# بخش ۲: خودرو (اختیاری) #}
-        <div class="card card-pad space-y-4 mt-4">
-            <div class="flex items-center gap-2">
-                <span class="grid h-9 w-9 place-items-center rounded-xl bg-accent-50 text-accent-600">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-4L8 8H5a2 2 0 0 0-2 2v6h2"/><path d="M9 16h6"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M19 16h2v-3.6a2 2 0 0 0-.6-1.4L18 8h-4"/></svg>
-                </span>
-                <h2 class="text-lg">خودرو</h2>
-                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[0.65rem] font-bold text-ink-muted">اختیاری</span>
-            </div>
-            <p class="text-xs text-ink-muted font-medium">اگه خالی بذاری، فقط مشتری ثبت می‌شه.</p>
-
-            {% include 'vehicles/_form.html' with form=vform %}
-        </div>
-
-        <button type="submit" class="btn-primary btn-block btn-lg mt-6">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            ثبت مشتری
-        </button>
-    </form>
-
+    <div class="sticky bottom-[5.5rem] z-10 grid gap-2 lg:bottom-4 sm:grid-cols-[1fr_auto]">
+      <button type="submit" name="then" value="oil" class="btn-accent btn-lg !rounded-2xl !py-4 text-lg shadow-pop">
+        {% include "partials/cy_icon.html" with name="drop-plus" cls="h-6 w-6" %}
+        ثبت و تعویض روغن
+      </button>
+      <button type="submit" class="btn-outline btn-lg !rounded-2xl bg-white">
+        {% include "partials/cy_icon.html" with name="check" cls="h-5 w-5" sw="2.8" %}
+        فقط ثبت کن
+      </button>
+    </div>
+  </form>
 </div>
 {% endblock %}

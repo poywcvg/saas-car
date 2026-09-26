@@ -1,9 +1,13 @@
 {% load jalali_tags %}
-{# کارت مقاله — ورودی: p (مقاله). کاور گرادیانی با آیکون دسته + متای مطالعه. #}
-<article class="card card-interactive overflow-hidden flex flex-col reveal">
+{# کارت مقاله — ورودی: p (مقاله). عکس کاور (یا در نبودش گرادیان با آیکون دسته) + متای مطالعه. #}
+<article class="group card card-interactive overflow-hidden flex flex-col reveal">
     <a href="{{ p.get_absolute_url }}" class="block" tabindex="-1" aria-hidden="true">
-        <div class="{% cycle 'blog-cover' 'blog-cover-accent' 'blog-cover-growth' %} h-44 grid place-items-center">
-            {% if p.category.icon_svg %}
+        <div class="{% cycle 'blog-cover' 'blog-cover-accent' 'blog-cover-growth' %} relative h-48 overflow-hidden grid place-items-center">
+            {% if p.cover_url %}
+            <img src="{{ p.cover_url }}" alt="{{ p.cover_alt_text }}" width="1200" height="675"
+                 loading="lazy" decoding="async"
+                 class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+            {% elif p.category.icon_svg %}
             <svg class="h-16 w-16 text-white/90 drop-shadow-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ p.category.icon_svg|safe }}</svg>
             {% else %}
             <svg class="h-16 w-16 text-white/90 drop-shadow-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>

@@ -5,8 +5,8 @@
 <div class="pack-container {% if product.is_flagship %}pack-container-flagship{% endif %}">
   <div class="pack-header">
     {% if product.icon_svg %}
-    <span class="pack-logo" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
+    <span class="pack-logo pack-logo-{{ product.tone }}" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
     </span>
     {% endif %}
     <p class="pack-title">
@@ -76,11 +76,17 @@
 <div class="pack-container pack-container-soon">
   <div class="pack-header">
     {% if product.icon_svg %}
-    <span class="pack-logo" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
+    <span class="pack-logo pack-logo-{{ product.tone }}" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{{ product.icon_svg|safe }}</svg>
     </span>
     {% endif %}
-    <p class="pack-title">{{ product.title }} — به‌زودی</p>
+    <p class="pack-title">
+      {{ product.title }}
+      <span class="pack-soon-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        به‌زودی
+      </span>
+    </p>
     <div class="pack-price-container" aria-hidden="true">
       <span class="pack-currency">…</span>
       <span class="num">؟</span>
@@ -96,7 +102,7 @@
             <path d="M4.5 12.75l6 6 9-13.5" stroke-linejoin="round" stroke-linecap="round"></path>
           </svg>
         </span>
-        <p>{{ product.description|default:"این محصول به‌زودی به سرویسا اضافه می‌شود."|truncatechars:80 }}</p>
+        <p>{{ product.description|default:"این محصول به‌زودی به چرخیار اضافه می‌شود."|truncatechars:80 }}</p>
       </li>
     </ul>
   </div>

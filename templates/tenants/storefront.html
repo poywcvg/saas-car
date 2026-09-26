@@ -1,7 +1,7 @@
 {% extends "tenants/base.html" %}
 {% load static %}
 
-{% block title %}{{ business.name }} — تعویض روغنی{% if business.city %} در {{ business.city }}{% endif %}{% endblock %}
+{% block title %}{% if "تعویض روغنی" in business.name %}{{ business.name }}{% if business.city %} در {{ business.city }}{% endif %}{% else %}{{ business.name }} — تعویض روغنی{% if business.city %} در {{ business.city }}{% endif %}{% endif %}{% endblock %}
 
 {% block content %}
 
@@ -20,6 +20,10 @@
             </span>
 
             <h1 class="mt-5 text-3xl sm:text-4xl lg:text-5xl leading-tight">
+                {# نام کسب‌وکار + کلمه‌ی کلیدیِ محلی داخلِ H1 #}
+                <span class="mb-3 block text-lg sm:text-xl font-extrabold text-brand-600">
+                    {% if "تعویض روغنی" in business.name %}{{ business.name }}{% if business.city %} در {{ business.city }}{% endif %}{% else %}{{ business.name }} — تعویض روغنی{% if business.city %} در {{ business.city }}{% endif %}{% endif %}
+                </span>
                 خودروت رو به‌موقع
                 <span class="text-gradient">سرویس کن.</span>
             </h1>
@@ -95,12 +99,60 @@
         </div>
     </div>
 
-    {% if business.address %}
-    <p class="mt-6 text-center text-sm text-ink-muted inline-flex w-full items-center justify-center gap-1.5">
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        {{ business.address }}
-    </p>
+</section>
+
+{# ===== نشانی و تماس (NAP) — همان داده‌ی JSON-LD، روی صفحه هم دیده می‌شود ===== #}
+<section id="contact" class="container-app pb-12">
+    <div class="card card-pad max-w-4xl mx-auto">
+        <h2 class="text-2xl">نشانی و تماس {{ business.name }}</h2>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+            {% if business.address %}
+            <div class="flex items-start gap-3">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600" aria-hidden="true">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <div>
+                    <p class="text-sm text-ink-muted font-bold">نشانی</p>
+                    <address class="not-italic text-ink font-medium leading-7">{% if business.city %}{{ business.city }}، {% endif %}{{ business.address }}</address>
+                </div>
+            </div>
+            {% endif %}
+            {% if business.phone %}
+            <div class="flex items-start gap-3">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-growth-50 text-growth-600" aria-hidden="true">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <div>
+                    <p class="text-sm text-ink-muted font-bold">تلفن</p>
+                    <a href="tel:{{ business.phone }}" class="text-ink font-black num" dir="ltr">{{ business.phone }}</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="mt-6 flex flex-wrap gap-3">
+            {% if business.phone %}
+            <a href="tel:{{ business.phone }}" class="btn-primary btn-lg">تماس بگیرید</a>
+            {% endif %}
+            {% if maps_url and not business.has_location %}
+            <a href="{{ maps_url }}" target="_blank" rel="noopener" class="btn-outline btn-lg">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg>
+                مسیریابی روی نقشه
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% if business.has_location %}
+    <div class="mx-auto mt-5 max-w-4xl">{% include "partials/shop_location.html" with b=business %}</div>
     {% endif %}
 </section>
+
+{# لینک برگشت به صفحه‌ی شهر (لینک داخلیِ دوطرفه) #}
+{% if city_page_url %}
+<section class="container-app pb-16">
+    <p class="text-center text-sm">
+        <a href="{{ city_page_url }}" class="font-bold text-brand-600 hover:text-brand-700">دیگر تعویض روغنی‌های {{ business.city }} ←</a>
+    </p>
+</section>
+{% endif %}
 
 {% endblock %}

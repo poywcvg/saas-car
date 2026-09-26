@@ -1,4 +1,4 @@
-"""مدل‌های وبلاگ سرویسا: دسته‌بندی، برچسب و مقاله.
+"""مدل‌های وبلاگ چرخیار: دسته‌بندی، برچسب و مقاله.
 
 سئو از همان ابتدا در مدل دیده شده: اسلاگ فارسی یکتا، متای اختصاصی هر
 مقاله، چکیده، پرسش‌های متداول (برای FAQPage)، زمان مطالعه‌ی خودکار و
@@ -9,6 +9,7 @@ import re
 from html import unescape
 
 from django.db import models
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -124,6 +125,27 @@ class Post(models.Model):
     )
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts", verbose_name="برچسب‌ها")
 
+    # --- عکس کاور (کارت، بالای مقاله، og:image و BlogPosting.image) ---
+    cover = models.ImageField(
+        upload_to="blog/covers/",
+        blank=True,
+        verbose_name="عکس کاور",
+        help_text="افقی و با کیفیت (حداقل ۱۲۰۰×۶۷۵). خالی = آیکون دسته.",
+    )
+    # عکس‌های مقاله‌های پیش‌فرض کنار کد (static) می‌مانند تا با مخزن منتقل شوند
+    cover_static = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="عکس کاور (مسیر static)",
+        help_text="مثلاً img/blog/oil-refill.webp — فقط وقتی «عکس کاور» خالی است.",
+    )
+    cover_alt = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="متن جایگزین عکس (alt)",
+        help_text="توصیف کوتاه عکس برای گوگل و نابینایان. خالی = عنوان مقاله.",
+    )
+
     # پرسش‌های متداول انتهای مقاله → آکاردئون + FAQPage در JSON-LD
     faqs = models.JSONField(
         default=list,
@@ -142,7 +164,7 @@ class Post(models.Model):
     og_image = models.URLField(
         blank=True,
         verbose_name="تصویر اشتراک‌گذاری (og:image)",
-        help_text="خالی = لوگوی سرویسا.",
+        help_text="خالی = لوگوی چرخیار.",
     )
 
     status = models.CharField(
@@ -194,6 +216,19 @@ class Post(models.Model):
     @property
     def seo_description(self):
         return self.meta_description or self.excerpt
+
+    @property
+    def cover_url(self):
+        """نشانی نسبیِ عکس کاور؛ رشته‌ی خالی یعنی آیکون دسته نمایش داده شود."""
+        if self.cover:
+            return self.cover.url
+        if self.cover_static:
+            return static(self.cover_static)
+        return ""
+
+    @property
+    def cover_alt_text(self):
+        return self.cover_alt or self.title
 
     def save(self, *args, **kwargs):
         # زمان مطالعه: ~۲۰۰ کلمه در دقیقه برای فارسی

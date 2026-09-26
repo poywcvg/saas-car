@@ -6,14 +6,12 @@
     python manage.py send_reminders --dry-run  # فقط نمایش، بدون ارسال
 """
 
-import datetime
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.urls import reverse
 
 from apps.customers.models import Customer
-from apps.vehicles.models import Vehicle
+from apps.vehicles.selectors import due_vehicles
 from core import service_status
 from core.sms import build_reminder_text, send_sms
 
@@ -37,16 +35,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         days = options["days"]
         dry_run = options["dry_run"]
-        today = datetime.date.today()
-        cutoff = today + datetime.timedelta(days=days)
 
-        due_vehicles = (
-            Vehicle.objects.filter(next_due_date__isnull=False, next_due_date__lte=cutoff)
-            .select_related("customer", "customer__business")
-        )
+        # موعد مؤثر (زودترینِ تاریخی و کیلومتری) — همان منطقِ پنل
+        overdue, due_soon = due_vehicles(days=days)
 
         # مشتریان دارای خودروی نیازمند یادآوری (بدون تکرار)
-        customer_ids = {v.customer_id for v in due_vehicles}
+        customer_ids = {v.customer_id for v in overdue + due_soon}
         if not customer_ids:
             self.stdout.write(self.style.SUCCESS("موردی برای یادآوری نیست."))
             return

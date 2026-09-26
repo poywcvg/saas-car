@@ -96,6 +96,21 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    # رنگ ثابت هر خدمت تا کاربر محصول را از رنگ لوگو هم بشناسد
+    TONES = {
+        "oil-change": "amber",
+        "filters": "green",
+        "battery": "blue",
+        "tires": "slate",
+        "carwash": "sky",
+        "caver": "sky",
+    }
+
+    @property
+    def tone(self):
+        """نام رنگ لوگوی محصول (برای کلاس pack-logo-*)؛ پیش‌فرض رنگ برند."""
+        return self.TONES.get(self.slug, "brand")
+
     @property
     def is_custom(self):
         """آیا این محصول را خودِ کسب‌وکار تعریف کرده (نه سراسری)."""

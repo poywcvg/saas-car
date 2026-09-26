@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
 
-{# چرمِ سایتِ نماینده: برندِ خودِ کسب‌وکار، نه سرویسا #}
+{# چرمِ سایتِ نماینده: برندِ خودِ کسب‌وکار، نه چرخیار #}
 {# عنوان با شهر، چون جست‌وجوی مشتری محلی است: «تعویض روغنی کرمان» #}
-{% block title %}{{ business.name }}{% if business.city %} — تعویض روغنی در {{ business.city }}{% endif %}{% endblock %}
+{% block title %}{{ business.name }}{% if business.city %}{% if "تعویض روغنی" in business.name %} در {{ business.city }}{% else %} — تعویض روغنی در {{ business.city }}{% endif %}{% endif %}{% endblock %}
 {% block title_suffix %}{% endblock %}
 
 {% block meta_description %}{{ business.name }}{% if business.city %}، تعویض روغنی در {{ business.city }}{% endif %}. {% if business.tagline %}{{ business.tagline }}. {% endif %}سابقه‌ی سرویس خودرو و یادآوری موعد تعویض روغن بعدی، آنلاین و بدون نصب اپ.{% endblock %}
 
-{% block og_title %}{{ business.name }}{% if business.city %} — تعویض روغنی در {{ business.city }}{% endif %}{% endblock %}
+{% block og_title %}{{ business.name }}{% if business.city %}{% if "تعویض روغنی" in business.name %} در {{ business.city }}{% else %} — تعویض روغنی در {{ business.city }}{% endif %}{% endif %}{% endblock %}
 {% block og_description %}{% if business.tagline %}{{ business.tagline }}{% else %}سابقه‌ی سرویس خودرو و یادآوری موعد تعویض روغن بعدی.{% endif %}{% endblock %}
 
 {% block jsonld %}{{ seo_local_ld }}{% endblock %}
@@ -59,7 +59,7 @@
         <p>© {% now "Y" %} {{ business.name }}</p>
         <p class="inline-flex items-center gap-1">
             قدرت‌ گرفته از
-            <a href="https://{{ TENANT_BASE_DOMAIN|default:'servisa.ir' }}" class="font-bold text-brand-600 footer-link">سرویسا</a>
+            <a href="https://{{ TENANT_BASE_DOMAIN|default:'charkhyar.ir' }}" class="font-bold text-brand-600 footer-link">چرخیار</a>
         </p>
     </div>
 </footer>

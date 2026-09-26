@@ -3,10 +3,12 @@
 این ویوها فقط در بافتِ مستأجر (request.is_tenant) و از طریق
 config.urls_tenant فراخوانی می‌شوند. همه‌چیز به request.business محدود است.
 """
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 
 from apps.vehicles.models import Vehicle
+from core import seo
 from core.normalize import normalize_phone, normalize_plate
 
 
@@ -20,10 +22,20 @@ def _tenant(request):
 def storefront(request):
     """ویترین/لندینگِ نماینده با برندِ خودش."""
     business = _tenant(request)
+    city = business.city or ""
     return render(
         request,
         "tenants/storefront.html",
-        {"business": business},
+        {
+            "business": business,
+            "maps_url": seo.maps_url(business)
+            if business.address or business.has_location
+            else "",
+            # لینک برگشت به صفحه‌ی شهر روی دامنه‌ی اصلی (لینک داخلیِ دوطرفه)
+            "city_page_url": seo.absolute_url(seo.city_page_path(city))
+            if city in settings.SEO_CITIES
+            else "",
+        },
     )
 
 

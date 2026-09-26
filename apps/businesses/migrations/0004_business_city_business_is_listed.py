@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='business',
             name='is_listed',
-            field=models.BooleanField(default=True, help_text='اگر خاموش باشد، در صفحه\u200cی شهر نمایش داده نمی\u200cشود.', verbose_name='نمایش در فهرست عمومی سرویسا'),
+            field=models.BooleanField(default=True, help_text='اگر خاموش باشد، در صفحه\u200cی شهر نمایش داده نمی\u200cشود.', verbose_name='نمایش در فهرست عمومی چرخیار'),
         ),
     ]

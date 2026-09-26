@@ -1,0 +1,35 @@
+{% load static %}{# لوکیشن مغازه برای مشتری: نقشه‌ی کوچک + دکمه‌های مسیریابی. ورودی: b (Business)، compact، noscript #}
+{% if b.has_location %}
+{% with apps=b.directions_urls %}
+<section class="reveal card overflow-hidden" aria-label="لوکیشن {{ b.name }}">
+  <a href="{{ apps.0.url }}" target="_blank" rel="noopener" class="relative block" aria-label="مسیریابی تا {{ b.name }}">
+    <div class="pm-map {% if compact %}h-40{% else %}h-48 sm:h-56{% endif %}" data-pin-map data-lat="{{ b.latitude|stringformat:'f' }}" data-lng="{{ b.longitude|stringformat:'f' }}" data-zoom="16"></div>
+    <svg class="pm-pin" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M24 46s16-14.2 16-26A16 16 0 0 0 8 20c0 11.8 16 26 16 26z" fill="#dc2626"/>
+      <circle cx="24" cy="20" r="6.5" fill="#fff"/>
+    </svg>
+    <span class="pm-shadow" aria-hidden="true"></span>
+  </a>
+  <div class="space-y-3 p-4">
+    {% if not compact %}
+    <div class="flex items-start gap-3">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-red-50 text-red-600">{% include "partials/cy_icon.html" with name="route" cls="h-5 w-5" %}</span>
+      <div class="min-w-0">
+        <p class="font-black">مسیریابی تا {{ b.name }}</p>
+        <p class="text-sm font-bold text-ink-muted">{% if b.address %}{% if b.city %}{{ b.city }}، {% endif %}{{ b.address }}{% else %}با برنامه‌ی نقشه‌ی گوشی‌ات برو{% endif %}</p>
+      </div>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-3 gap-2">
+      {% for app in apps %}
+      <a href="{{ app.url }}" target="_blank" rel="noopener" class="pm-go">
+        <span class="pm-go-dot {% if app.key == 'neshan' %}bg-rose-500{% elif app.key == 'balad' %}bg-green-500{% else %}bg-blue-500{% endif %}" aria-hidden="true"></span>
+        {{ app.label }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endwith %}
+{% if not noscript %}<script defer src="{% static 'js/pin-map.js' %}"></script>{% endif %}
+{% endif %}

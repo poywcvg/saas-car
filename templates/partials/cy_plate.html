@@ -1,0 +1,1 @@
+{% load jalali_tags %}{% with pp=p|plate_parts %}<span class="cy-plate {{ cls }}" dir="ltr" aria-label="پلاک {{ p|fa }}"><span class="cy-plate-ir" aria-hidden="true"><i></i>I.R.<br>IRAN</span><span class="cy-plate-main num">{{ pp.0|fa }}</span>{% if pp.1 %}<span class="cy-plate-reg num"><small>ایران</small>{{ pp.1|fa }}</span>{% endif %}</span>{% endwith %}

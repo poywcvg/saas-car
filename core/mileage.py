@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import datetime
+from django.utils import timezone
 
 # اگر تاریخچه‌ای برای تخمین نرخ نباشد، این نرخ پیش‌فرض به کار می‌رود
 # (میانگین رانندگی روزمرهٔ یک خودروی شهری در ایران؛ محافظه‌کارانه)
@@ -70,7 +71,7 @@ def estimate_current_mileage(
     if last_mileage_km is None or last_service_date is None:
         return None
     if today is None:
-        today = datetime.date.today()
+        today = timezone.localdate()
     rate = daily_km or DEFAULT_DAILY_KM
     elapsed = max(0, (today - last_service_date).days)
     return int(round(last_mileage_km + rate * elapsed))

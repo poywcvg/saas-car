@@ -19,7 +19,7 @@
     <div class="field">
         <label for="id_brand" class="label flex items-center gap-1.5">
             {{ form.brand.label }}
-            <span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>
+            {% if form.brand.field.required %}<span class="rounded-full bg-red-50 px-1.5 py-0.5 text-[0.65rem] font-bold text-danger">الزامی</span>{% else %}<span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>{% endif %}
         </label>
         <select name="brand" id="id_brand" class="input" x-model="brand" @change="onBrandChange()">
             <option value="">انتخاب برند…</option>
@@ -39,7 +39,7 @@
     <div class="field">
         <label for="id_model" class="label flex items-center gap-1.5">
             {{ form.model.label }}
-            <span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>
+            {% if form.model.field.required %}<span class="rounded-full bg-red-50 px-1.5 py-0.5 text-[0.65rem] font-bold text-danger">الزامی</span>{% else %}<span class="text-[0.65rem] font-medium text-ink-muted">(اختیاری)</span>{% endif %}
         </label>
         <select name="model" id="id_model" class="input" x-model="model" :disabled="!brand">
             <option value="" x-text="brand ? 'انتخاب مدل…' : 'اول برند را انتخاب کن…'"></option>

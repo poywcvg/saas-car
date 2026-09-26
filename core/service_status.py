@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+from django.utils import timezone
 
 # چند روز مانده به موعد، «نزدیک موعد» حساب شود
 DUE_SOON_DAYS = 14
@@ -27,7 +28,7 @@ def compute_status(next_due_date, today: datetime.date | None = None) -> str:
     if next_due_date is None:
         return NONE
     if today is None:
-        today = datetime.date.today()
+        today = timezone.localdate()
     if next_due_date < today:
         return OVERDUE
     if next_due_date <= today + datetime.timedelta(days=DUE_SOON_DAYS):
@@ -40,5 +41,5 @@ def days_until(next_due_date, today: datetime.date | None = None) -> int | None:
     if next_due_date is None:
         return None
     if today is None:
-        today = datetime.date.today()
+        today = timezone.localdate()
     return (next_due_date - today).days

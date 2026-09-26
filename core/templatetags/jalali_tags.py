@@ -32,3 +32,23 @@ def absval(value):
         return abs(value)
     except (TypeError, ValueError):
         return value
+
+
+@register.simple_tag(name="jalali_today")
+def jalali_today(with_day_name=True):
+    """تاریخ امروز به شمسی؛ مثال: «پنجشنبه ۳ مهر ۱۴۰۵»."""
+    from django.utils import timezone
+
+    return format_jalali(timezone.localdate(), with_day_name=with_day_name)
+
+
+@register.filter(name="plate_parts")
+def plate_parts(value):
+    """«۱۲ب۳۴۵-۶۷» → (بخش اصلی، کد شهر) برای نمایش پلاک ایرانی."""
+    import re
+
+    text = (value or "").strip()
+    m = re.match(r"^(.*?)\s*-\s*(\S{2})$", text)
+    if m:
+        return (m.group(1), m.group(2))
+    return (text, "")

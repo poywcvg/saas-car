@@ -22,11 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# در تولید حتماً DJANGO_SECRET_KEY را در محیط تنظیم کنید.
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-*saf9^v0x7*s@&5j$izg3zs+c4_n1zi-x$hzc0ugmq)_w15dq4",
@@ -36,16 +32,16 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes", "on")
 
 # --- میزبان‌ها و چند-مستأجری (multitenancy) ---
-# دامنه‌ی پایه‌ی سرویسا؛ ساب‌دامین هر نماینده: <subdomain>.<TENANT_BASE_DOMAIN>
-TENANT_BASE_DOMAIN = "servisa.ir"
+# دامنه‌ی پایه‌ی چرخیار؛ ساب‌دامین هر نماینده: <subdomain>.<TENANT_BASE_DOMAIN>
+TENANT_BASE_DOMAIN = "charkhyar.ir"
 
 # در توسعه، ساب‌دامین‌های *.localhost روی 127.0.0.1 حل می‌شوند؛
 # پس لینک‌های ساخته‌شده در حالت DEBUG از این دامنه استفاده می‌کنند.
 TENANT_DEV_BASE_DOMAIN = "localhost"
 
-# میزبان‌های خودِ پلتفرم (لندینگ عمومی سرویسا، پنل مالک پلتفرم و ...)
+# میزبان‌های خودِ پلتفرم (لندینگ عمومی چرخیار، پنل مالک پلتفرم و ...)
 # روی این میزبان‌ها request.business = None و urlconf پیش‌فرض استفاده می‌شود.
-PLATFORM_HOSTS = ["localhost", "127.0.0.1", "servisa.ir", "www.servisa.ir"]
+PLATFORM_HOSTS = ["localhost", "127.0.0.1", "charkhyar.ir", "www.charkhyar.ir"]
 
 # پورت توسعه برای ساخت لینک ساب‌دامین‌ها (فقط وقتی DEBUG)
 TENANT_DEV_PORT = "8000"
@@ -55,27 +51,55 @@ TENANT_DEV_PORT = "8000"
 # sitemap.xml، Open Graph و JSON-LD — از همین یک مقدار ساخته می‌شوند؛
 # پس برای تغییر دامنه فقط همین خط عوض می‌شود.
 SITE_SCHEME = "https"
-SITE_DOMAIN = TENANT_BASE_DOMAIN          # servisa.ir
+SITE_DOMAIN = TENANT_BASE_DOMAIN          # charkhyar.ir
 SITE_URL = f"{SITE_SCHEME}://{SITE_DOMAIN}"
-SITE_NAME = "سرویسا"
+SITE_NAME = "چرخیار"
 
 # شهرِ تمرکزِ سئوی محلی. صفحه‌ی «تعویض روغنی در <شهر>» برای این شهرها
-# ساخته و در sitemap ثبت می‌شود.
+# ساخته می‌شود. شهرِ اصلی همیشه ایندکس می‌شود؛ بقیه فقط وقتی دست‌کم یک
+# تعویض روغنیِ ثبت‌شده دارند (تا صفحه‌ی خالی «محتوای کم‌ارزش» حساب نشود).
 SEO_PRIMARY_CITY = "کرمان"
-SEO_CITIES = ["کرمان"]
+SEO_CITIES = ["کرمان", "رفسنجان", "سیرجان", "بم", "جیرفت", "زرند"]
+SEO_REGION_NAME = "استان کرمان"
+SEO_REGION_CODE = "IR-08"  # ISO 3166-2 استان کرمان — برای متای geo.region
+
+# مختصات مرکز هر شهر (برای متای geo و GeoCoordinates در JSON-LD)
+SEO_CITY_GEO = {
+    "کرمان": (30.2839, 57.0834),
+    "رفسنجان": (30.4067, 55.9939),
+    "سیرجان": (29.4520, 55.6814),
+    "بم": (29.1060, 58.3570),
+    "جیرفت": (28.6751, 57.7372),
+    "زرند": (30.8127, 56.5640),
+}
+
+# کدهای تأیید مالکیت سایت در کنسول جست‌وجو (از محیط؛ خالی = درج نمی‌شود)
+GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "")
+BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "")
+YANDEX_SITE_VERIFICATION = os.environ.get("YANDEX_SITE_VERIFICATION", "")
+
+# شبکه‌های اجتماعی برند (sameAs در JSON-LD و لینک‌های فوتر؛ خالی = پنهان)
+SOCIAL_LINKS = {
+    "instagram": os.environ.get("SOCIAL_INSTAGRAM", ""),
+    "telegram": os.environ.get("SOCIAL_TELEGRAM", ""),
+    "whatsapp": os.environ.get("SOCIAL_WHATSAPP", ""),
+}
+
+# قیمت اشتراک ماهانه‌ی تعویض روغن (ریال) — برای Offer در داده‌ی ساختاریافته
+SEO_PRICE_MONTHLY_IRR = 490000
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".localhost",       # هر ساب‌دامین *.localhost در توسعه
-    ".servisa.ir",      # هر ساب‌دامین *.servisa.ir در تولید
+    ".charkhyar.ir",      # هر ساب‌دامین *.charkhyar.ir در تولید
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://*.localhost:8000",
-    "https://servisa.ir",
-    "https://*.servisa.ir",
+    "https://charkhyar.ir",
+    "https://*.charkhyar.ir",
 ]
 
 
@@ -188,6 +212,11 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# فایل‌های آپلودی (مثل عکس کاور مقاله‌ها) — در پروداکشن باید وب‌سرور /media/ را سرو کند
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -204,5 +233,8 @@ LOGIN_REDIRECT_URL = "businesses:dashboard"
 LOGOUT_REDIRECT_URL = "home"
 
 
-# آدرس پایه‌ی سایت برای ساخت لینک‌های مطلق خارج از request (مثلاً در پیامک)
-SITE_BASE_URL = "http://localhost:8000"
+# آدرس پایه‌ی سایت برای ساخت لینک‌های مطلق خارج از request (مثلاً در پیامک).
+# در production همان SITE_URL است تا پیامک‌ها لینکِ localhost نفرستند.
+SITE_BASE_URL = os.environ.get(
+    "SITE_BASE_URL", "http://localhost:8000" if DEBUG else SITE_URL
+)
