@@ -2555,3 +2555,119 @@ main { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .pm-pin, .pm-shadow { animation: none; transition: none; }
 }
+
+/* ===== ورود/ثبت‌نام: کارت کشویی (الهام از uiverse / frontendjoe) =====
+   یک checkbox مخفی (.au-toggle) بین دو حالت جابه‌جا می‌کند — بدون جاوااسکریپت.
+   دسکتاپ: عکس (.au-bg) بین دو نیمه‌ی کارت سُر می‌خورد. موبایل: عکس بنرِ بالا و فرم زیرش. */
+.au-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 36rem;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: #fff;
+  border: 8px solid #fff;
+  box-shadow: 0 30px 60px -20px rgb(15 23 42 / 0.25), 0 0 0 1px rgb(15 23 42 / 0.04);
+}
+.au-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  opacity: 0;
+}
+.au-bg,
+.au-hero,
+.au-form { grid-row: 1; }
+.au-bg {
+  grid-column: 2;
+  z-index: 2;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(to top, rgb(15 23 42 / 0.9), rgb(15 23 42 / 0.35) 60%, rgb(15 23 42 / 0.2)),
+    var(--au-img) center / cover no-repeat;
+  transition: transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.au-hero,
+.au-form {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.65s ease-in-out, visibility 0.65s ease-in-out, transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.au-hero {
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1.75rem;
+  color: #f9f9f9;
+  text-align: center;
+}
+.au-hero.is-login { grid-column: 2; }
+.au-hero.is-register { grid-column: 1; transform: translateX(100%); }
+.au-hero h2 { font-size: 1.75rem; font-weight: 900; line-height: 1.3; }
+.au-hero p { margin: 0 0 0.35rem; max-width: 19rem; font-weight: 700; line-height: 1.8; opacity: 0.9; }
+.au-swap {
+  display: inline-flex;
+  min-height: 3.25rem;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #f9f9f9;
+  padding: 0.75rem 2.25rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  background: rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: background 0.3s, color 0.3s, transform 0.15s;
+}
+.au-swap:hover { color: #0f172a; background: #f9f9f9; }
+.au-swap:active { transform: scale(0.97); }
+.au-toggle:focus-visible ~ .au-hero .au-swap { outline: 3px solid #fff; outline-offset: 3px; }
+.au-form {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.25rem 2rem;
+}
+.au-form.is-login { grid-column: 1; }
+.au-form.is-register { grid-column: 2; transform: translateX(100%); }
+
+/* حالت اول: ورود */
+.au-hero.is-login,
+.au-form.is-login { opacity: 1; visibility: visible; }
+/* حالت دوم: ثبت‌نام */
+.au-toggle:checked ~ .au-bg { transform: translateX(100%); }
+.au-toggle:checked ~ .au-hero.is-login,
+.au-toggle:checked ~ .au-form.is-login { opacity: 0; visibility: hidden; transform: translateX(-100%); }
+.au-toggle:checked ~ .au-hero.is-register,
+.au-toggle:checked ~ .au-form.is-register { opacity: 1; visibility: visible; transform: none; }
+
+@media (max-width: 767px) {
+  .au-card { grid-template-columns: 1fr; min-height: 0; border-width: 6px; border-radius: 1.75rem; }
+  .au-bg { grid-column: 1; min-height: 12.5rem; transform: none !important; }
+  .au-hero { grid-column: 1 !important; transform: none !important; gap: 0.6rem; padding: 1.25rem 1rem; }
+  .au-hero h2 { font-size: 1.35rem; }
+  .au-hero p { font-size: 0.875rem; line-height: 1.7; }
+  .au-swap { min-height: 2.9rem; padding: 0.6rem 1.6rem; font-size: 0.95rem; }
+  .au-form { grid-row: 2; grid-column: 1 !important; transform: none !important; display: none; padding: 1.5rem 1rem 1.25rem; }
+  .au-form.is-login,
+  .au-toggle:checked ~ .au-form.is-register { display: flex; animation: au-in 0.4s ease-out; }
+  .au-toggle:checked ~ .au-form.is-login { display: none; }
+}
+@keyframes au-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .au-bg, .au-hero, .au-form { transition: none; }
+  .au-form { animation: none !important; }
+}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {# صفحه‌ی خصوصی/کاربردی — نباید در نتایج گوگل بیاید #}
 {% block robots %}noindex, follow{% endblock %}
 
@@ -9,123 +10,134 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
-<div class="container-app py-10 sm:py-16">
-    <div class="mx-auto w-full max-w-md">
+<div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
+  <div class="pointer-events-none absolute -top-32 left-1/2 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-brand-100/60 blur-3xl" aria-hidden="true"></div>
 
-        {# ===== سربرگ ===== #}
-        <div class="text-center mb-8">
-            <span class="grid h-14 w-14 mx-auto place-items-center rounded-2xl bg-brand-50 text-brand-600 mb-4">
-                {% if active == 'register' %}
-                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-                {% elif active == 'otp' %}
-                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                {% else %}
-                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-                {% endif %}
-            </span>
-            <h1 class="text-3xl">{% if active == 'register' %}ساخت حساب{% elif active == 'otp' %}ورود با کد تایید{% else %}ورود{% endif %}</h1>
-            <p class="mt-2 text-ink-soft font-medium">
-                {% if active == 'register' %}کمتر از یک دقیقه ثبت‌نام کن.
-                {% elif active == 'otp' %}کد تایید به شماره‌ی شما ارسال می‌شود.
-                {% else %}خوش برگشتی! وارد حسابت شو.{% endif %}
-            </p>
-        </div>
+  <a href="/" class="relative mb-6 flex items-center gap-2.5">
+    <img src="{% static 'img/logo.png' %}" alt="" class="h-11 w-11 rounded-2xl" width="44" height="44">
+    <span class="text-xl font-black">چرخیار</span>
+  </a>
 
-        <div class="card card-pad">
-            {% if active == 'register' %}
-            {# ===== فرم ثبت‌نام ===== #}
-            <form method="post" action="{% url 'accounts:register' %}" class="space-y-5">
-                {% csrf_token %}
+  {# کارت کشویی: چک‌باکس مخفی بین «ورود» و «ثبت‌نام» جابه‌جا می‌کند #}
+  <div class="au-card relative w-full max-w-[60rem]" style="--au-img: url('{% static 'img/blog/mechanic-oil.webp' %}')">
+    <input type="checkbox" id="au-toggle" class="au-toggle" aria-label="جابه‌جایی بین ورود و ثبت‌نام" {% if active == 'register' %}checked{% endif %}>
+    <div class="au-bg" aria-hidden="true"></div>
 
-                {% if register_form.non_field_errors %}
-                <div class="rounded-xl bg-red-50 border border-red-100 p-3 space-y-1">
-                    {% for error in register_form.non_field_errors %}
-                    <p class="error-text">{{ error }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {% include 'partials/field.html' with field=register_form.first_name %}
-                    {% include 'partials/field.html' with field=register_form.last_name %}
-                </div>
-
-                {% include 'partials/field.html' with field=register_form.username %}
-                {% include 'partials/field.html' with field=register_form.phone %}
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {% include 'partials/field.html' with field=register_form.password %}
-                    {% include 'partials/field.html' with field=register_form.password_confirm %}
-                </div>
-
-                <button type="submit" class="btn-primary btn-block btn-lg">
-                    ساخت حساب
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </button>
-            </form>
-
-            {% elif active == 'otp' %}
-            {# ===== فرم ورود با OTP ===== #}
-            <form method="post" action="{% url 'accounts:send_otp' %}" class="space-y-5">
-                {% csrf_token %}
-
-                <div class="field">
-                    <label for="id_phone" class="label">شماره موبایل</label>
-                    <input type="tel" name="phone" id="id_phone" placeholder="۰۹۱۲۱۲۳۴۵۶۷" dir="ltr"
-                           class="input" required maxlength="15">
-                </div>
-
-                <button type="submit" class="btn-primary btn-block btn-lg">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    ارسال کد تایید
-                </button>
-            </form>
-
-            {% else %}
-            {# ===== فرم ورود ===== #}
-            <form method="post" action="{% url 'accounts:login' %}" class="space-y-5">
-                {% csrf_token %}
-
-                {% if login_form.non_field_errors %}
-                <div class="rounded-xl bg-red-50 border border-red-100 p-3 space-y-1">
-                    {% for error in login_form.non_field_errors %}
-                    <p class="error-text">{{ error }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                {% include 'partials/field.html' with field=login_form.username %}
-                {% include 'partials/field.html' with field=login_form.password %}
-
-                <button type="submit" class="btn-primary btn-block btn-lg">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-                    ورود
-                </button>
-            </form>
-            {% endif %}
-        </div>
-
-        {# ===== سوییچ بین روش‌های ورود ===== #}
-        <div class="mt-6 text-center text-sm font-medium text-ink-soft space-y-2">
-            {% if active == 'otp' %}
-            <p>
-                <a href="{% url 'accounts:login' %}" class="font-extrabold text-brand-600">ورود با رمز عبور</a>
-            </p>
-            {% elif active == 'login' %}
-            <p>
-                <a href="{% url 'accounts:otp_login' %}" class="font-extrabold text-brand-600">ورود با کد تایید</a>
-            </p>
-            {% endif %}
-
-            <p>
-                {% if active == 'register' %}
-                حساب داری؟ <a href="{% url 'accounts:login' %}" class="font-extrabold text-brand-600">وارد شو</a>
-                {% else %}
-                حساب نداری؟ <a href="{% url 'accounts:register' %}" class="font-extrabold text-brand-600">ثبت‌نام کن</a>
-                {% endif %}
-            </p>
-        </div>
-
+    {# ===== روی عکس، کنار فرم ورود: دعوت به ثبت‌نام ===== #}
+    <div class="au-hero is-login">
+      <h2>تازه اومدی؟</h2>
+      <p>مغازه‌ات را در یک دقیقه ثبت کن و یادآوری تعویض روغن مشتری‌ها را به چرخیار بسپار.</p>
+      <label for="au-toggle" class="au-swap">
+        {% include "partials/cy_icon.html" with name="user-plus" cls="h-5 w-5" %} ساخت حساب
+      </label>
     </div>
+
+    {# ===== روی عکس، کنار فرم ثبت‌نام: دعوت به ورود ===== #}
+    <div class="au-hero is-register">
+      <h2>قبلاً ثبت‌نام کردی؟</h2>
+      <p>وارد شو و ببین وقت تعویض روغن کدام مشتری‌ها رسیده.</p>
+      <label for="au-toggle" class="au-swap">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        ورود
+      </label>
+    </div>
+
+    {# ===== فرم ورود (با رمز یا با کد پیامکی) ===== #}
+    <section class="au-form is-login" aria-label="ورود">
+      <div class="mb-6">
+        <h1 class="text-2xl font-black sm:text-3xl">{% if active == 'otp' %}ورود با کد پیامکی{% else %}ورود به چرخیار{% endif %}</h1>
+        <p class="mt-1.5 font-bold text-ink-muted">{% if active == 'otp' %}شماره‌ات را بزن؛ کد برایت پیامک می‌شود.{% else %}خوش برگشتی! وارد حسابت شو.{% endif %}</p>
+      </div>
+
+      {% if active == 'otp' %}
+      <form method="post" action="{% url 'accounts:send_otp' %}" class="space-y-5">
+        {% csrf_token %}
+        <div class="field">
+          <label for="id_otp_phone" class="label">شماره موبایل</label>
+          <input type="tel" name="phone" id="id_otp_phone" placeholder="۰۹۱۲۱۲۳۴۵۶۷" dir="ltr"
+                 class="input" required maxlength="15" inputmode="tel" autocomplete="tel">
+        </div>
+        <button type="submit" class="btn-primary btn-block btn-lg !rounded-2xl">
+          {% include "partials/cy_icon.html" with name="sms" cls="h-5 w-5" %} کد را برایم بفرست
+        </button>
+      </form>
+      <a href="{% url 'accounts:login' %}{% if next_url %}?next={{ next_url|urlencode }}{% endif %}"
+         class="mt-4 inline-flex min-h-[2.75rem] items-center gap-2 self-center rounded-xl px-3 text-sm font-black text-brand-600 hover:bg-brand-50">
+        ورود با نام کاربری و رمز
+      </a>
+
+      {% else %}
+      <form method="post" action="{% url 'accounts:login' %}" class="space-y-5">
+        {% csrf_token %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+        {% if login_form.non_field_errors %}
+        <div class="space-y-1 rounded-2xl border border-red-100 bg-red-50 p-3">
+          {% for error in login_form.non_field_errors %}<p class="error-text">{{ error }}</p>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% include 'partials/field.html' with field=login_form.username %}
+        {% include 'partials/field.html' with field=login_form.password %}
+
+        <button type="submit" class="btn-primary btn-block btn-lg !rounded-2xl">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+          ورود
+        </button>
+      </form>
+      <a href="{% url 'accounts:otp_login' %}{% if next_url %}?next={{ next_url|urlencode }}{% endif %}"
+         class="mt-4 flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl bg-surface-soft px-3 text-sm font-black text-ink-soft transition hover:bg-brand-50 hover:text-brand-700">
+        {% include "partials/cy_icon.html" with name="sms" cls="h-5 w-5" %} رمز یادت نیست؟ با کد پیامکی وارد شو
+      </a>
+      {% endif %}
+
+      <p class="mt-4 text-center text-sm font-bold text-ink-muted md:hidden">
+        حساب نداری؟ <label for="au-toggle" class="cursor-pointer font-black text-brand-600">ثبت‌نام کن</label>
+      </p>
+    </section>
+
+    {# ===== فرم ثبت‌نام ===== #}
+    <section class="au-form is-register" aria-label="ثبت‌نام">
+      <div class="mb-5">
+        <h2 class="text-2xl font-black sm:text-3xl">ساخت حساب</h2>
+        <p class="mt-1.5 font-bold text-ink-muted">کمتر از یک دقیقه طول می‌کشد.</p>
+      </div>
+
+      <form method="post" action="{% url 'accounts:register' %}" class="space-y-4">
+        {% csrf_token %}
+
+        {% if register_form.non_field_errors %}
+        <div class="space-y-1 rounded-2xl border border-red-100 bg-red-50 p-3">
+          {% for error in register_form.non_field_errors %}<p class="error-text">{{ error }}</p>{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {% include 'partials/field.html' with field=register_form.first_name %}
+          {% include 'partials/field.html' with field=register_form.last_name %}
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {% include 'partials/field.html' with field=register_form.username %}
+          {% include 'partials/field.html' with field=register_form.phone %}
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {% include 'partials/field.html' with field=register_form.password %}
+          {% include 'partials/field.html' with field=register_form.password_confirm %}
+        </div>
+
+        <button type="submit" class="btn-primary btn-block btn-lg !rounded-2xl">
+          {% include "partials/cy_icon.html" with name="check" cls="h-5 w-5" sw="2.8" %} ساخت حساب
+        </button>
+      </form>
+
+      <p class="mt-4 text-center text-sm font-bold text-ink-muted md:hidden">
+        حساب داری؟ <label for="au-toggle" class="cursor-pointer font-black text-brand-600">وارد شو</label>
+      </p>
+    </section>
+  </div>
+
+  <a href="/" class="relative mt-6 inline-flex min-h-[2.75rem] items-center gap-1.5 rounded-xl px-3 text-sm font-bold text-ink-muted hover:text-ink">
+    {% include "partials/cy_icon.html" with name="back" cls="h-4 w-4" %} برگشت به صفحه‌ی اصلی
+  </a>
 </div>
 {% endblock %}

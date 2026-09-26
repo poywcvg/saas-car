@@ -31,12 +31,14 @@ def _safe_next(request, default="businesses:dashboard"):
     return default
 
 
-def _auth_context(login_form, register_form, active):
+def _auth_context(request, login_form, register_form, active):
     """context مشترک برای قالب یکپارچه‌ی ورود/ثبت‌نام."""
     return {
         "login_form": login_form,
         "register_form": register_form,
-        "active": active,  # "login" یا "register"
+        "active": active,  # "login"، "register" یا "otp"
+        # فقط مقصدِ امن و داخلی را در فرم‌ها و لینک‌ها نگه می‌داریم
+        "next_url": _safe_next(request, default=""),
     }
 
 
@@ -54,13 +56,13 @@ def login_view(request):
         return render(
             request,
             "accounts/auth.html",
-            _auth_context(login_form, RegisterForm(), "login"),
+            _auth_context(request, login_form, RegisterForm(), "login"),
         )
 
     return render(
         request,
         "accounts/auth.html",
-        _auth_context(LoginForm(request), RegisterForm(), "login"),
+        _auth_context(request, LoginForm(request), RegisterForm(), "login"),
     )
 
 
@@ -72,7 +74,7 @@ def otp_login(request):
     return render(
         request,
         "accounts/auth.html",
-        _auth_context(LoginForm(request), RegisterForm(), "otp"),
+        _auth_context(request, LoginForm(request), RegisterForm(), "otp"),
     )
 
 
@@ -91,13 +93,13 @@ def register(request):
         return render(
             request,
             "accounts/auth.html",
-            _auth_context(LoginForm(request), register_form, "register"),
+            _auth_context(request, LoginForm(request), register_form, "register"),
         )
 
     return render(
         request,
         "accounts/auth.html",
-        _auth_context(LoginForm(request), RegisterForm(), "register"),
+        _auth_context(request, LoginForm(request), RegisterForm(), "register"),
     )
 
 
